@@ -106,7 +106,36 @@ fn main() {
 
     /*
         Augmented Assignment Operator
+        It's common that we perform an operation on a specific variable and then reassign to the variable
+
     */
+    let mut year = 2025;
+    year = year + 1;
+    println!("{year}");
+    year += 1;
+    println!("{year}");
+
+    /*
+        Intro to Booleans
+        A type whose values can only be true or false
+        Rust uses a full byte for a boolean for performance reasons. Individual bits are too slow to access
+        A boolean can be inverted with the ! operator
+    */
+    let is_handsome = true;
+    let is_silly = false;
+    let age: i32 = 32;
+
+    let is_young = age < 35;
+    println!("{is_young}");
+    println!("{} {}", age.is_positive(), age.is_negative());
+
+    println!("{}", !age.is_positive()); // inverting the boolean
+
+    /*
+        Equality and Inequality Operators
+        
+    */
+
 
 
 }
