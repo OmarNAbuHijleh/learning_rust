@@ -120,6 +120,16 @@ fn main() {
         A type whose values can only be true or false
         Rust uses a full byte for a boolean for performance reasons. Individual bits are too slow to access
         A boolean can be inverted with the ! operator
+
+        Equality and Inequality Operators
+        ==
+        !=
+        >=
+        >
+        <=
+        <
+        &&
+        ||  
     */
     let is_handsome = true;
     let is_silly = false;
@@ -132,10 +142,71 @@ fn main() {
     println!("{}", !age.is_positive()); // inverting the boolean
 
     /*
-        Equality and Inequality Operators
+        The character type
+        A character datatype represents a single unicode character. It doesn't necessarily have to be alphabetic. It could be an emoji, for example. UTF-8 is another example.
+        Unicode characters in Rust are 32 bits so that we can store any possible unicode character
+    */
+    let first_character = 'c';
+    let emoji = '🙂'; // This is another character
+    println!("{} is alphabetic? {}", first_character, first_character.is_alphabetic());
+    println!("{} is alphabetic? {}", first_character, first_character.is_uppercase());
+    println!("{} is alphabetic? {}", first_character, first_character.is_lowercase());
+    println!("{} is alphabetic? {}", emoji, emoji.is_alphabetic());
+
+
+    /*
+        The Array Type
+        This is a compound type. It contains more than one value. 
+        It is a fixed size collection of homogoneous data (i.e. 1 data type the entire time)
+        It's also an ordered sequence of elements.
+    */
+    let numbers = [4, 8, 15, 16, 23, 42];
+    let mut apples = ["Hershey", "Recess Puffs", "Mars"];
+    println!("Length: {}", apples.len());
+
+    let candy_bar = apples[0];
+    println!("The candy bar is {}", candy_bar);
+
+    apples[0] = "Crunch"; // Changing array value at specified index
+    let candy_bar = apples[0]; 
+    println!("The candy bar is {}", candy_bar);
+
+
+    /*
+        The display trait
+        In the real world, a contract is a document people sign that state their obligations. It's a similar idea to traits in Rust.
+
+        In Rust, a trait is like a contract that requires a type support one or more methods. 
+        They establish consistency between different types. When a type honors those requirements, it "implements" the trait. The types themselves can still vary in implemenatation logic
+
+        A type doesn't have to implement a trait. It is up to the developer what traits are implemented for what types. This is basically interfaces in other programming languages
+
+        NOTE: The benefit if a trait is that they are handled during compile time instead of run time, reducing the number of dynamic lookups that take place!
+
+        ABOUT THE DISPLAY TRAIT: The display trait requires that a type can be represented as a user-friendly, readable string. 
+        When we use the {} interpolation syntax, Rust calls on the format method for that type.
+
+        Integers, floats, and booleans all implement the display trait so that we're able to interpolate them with curly braces.
+
+        It's not always clear how a complex type should be represented as a piece of text. An example would be an array type. Rust didn't implement the display trait for the array
+    */
+    // println!("{}", apples); // This will give an error
+    println!("{}", 1);
+    println!("{}", 1.5);
+    println!("{}", true);
+
+    /*
+        The debug trait
+        The goal of the debug trait is to format a given type to a string for debugging purposes. It's similar to the display trait. 
+        The debug trait is made for an array, whereas the display trait is not!
+    */
+    println!("{:?}", apples); // This is how we call the debug trait
+    println!("{apples:?}"); // This is how we call the debug trait
+    println!("{apples:#?}"); // This is how we call the debug trait - this one is going to prettify the output
+
+    /*
+        The dbg! macro
         
     */
-
-
 
 }
