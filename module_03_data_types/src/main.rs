@@ -206,7 +206,18 @@ fn main() {
 
     /*
         The dbg! macro
-        
+        A macro is not exactly a function but is instead replaced with valid function calls.
+        The debug macro exists to print and return the value of a given expression for quick and dirty debugging.
+
+        A trait is an interface basically. a macro is the actual function call that takes place for that interface!
+        The argument we pass into the debug macro MUST implement the debug trait!
+    */
+    dbg!(2+2); 
+    dbg!(apples);
+
+
+    /*
+        The Tuple type
     */
 
 }
