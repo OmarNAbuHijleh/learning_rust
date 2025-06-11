@@ -218,6 +218,24 @@ fn main() {
 
     /*
         The Tuple type
+        A collection type that contain multiple elements and fixed in size. The difference between this and a list is that we're permitted more than 1 data type!
+    */
+
+    let person_info = ("Omar Abu-Hijleh", 28, "Data Scientist"); //This is a tuple declaration
+    dbg!(person_info);
+
+    // The following is how we extract the values of a tuple
+    let name = person_info.0;
+    let age = person_info.1;
+    let profession = person_info.2;
+
+
+    // We can also do it this way:
+    let (name, age, profession) = person_info; // This is another valid way of assigning values of a tuple to variables
+
+
+    /*
+        Ranges and range iteration
     */
 
 }
