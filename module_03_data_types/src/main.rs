@@ -236,6 +236,57 @@ fn main() {
 
     /*
         Ranges and range iteration
+        A range represents a sequence or interval of consecutive values
+        for example - values of 15 through 23, or letters from lowercase "b" to "h"
+
+        
     */
+    let month_days = 1..31; // This is how we declare a range in rust! Note that the upper value is exclusive
+    let month_days_2 = 1..=31; // This is how we declare a range in rust! Note that the upper value is inclusive
+
+    // to iterate over a range
+    for number in month_days{
+        println!("{number}")
+    }
+
+
+
+    /*
+        Intro into Generics
+        Note that in the type inferencing of our range, we have another datatype in between <>. This indicates the type of the range.
+
+        This range type uses a programming concept called a "generic". A generic represents a type argument. The argument to a given function is a data type!
+    */
+
+    // Below is an example of a range with explicit type declaration
+    let weeks_in_year: std::ops::Range<i32> = 1..53;
+    let range_inclusive_version: std::ops::RangeInclusive<i32> = 1..=52; 
+
+    
+    /*
+    Declare a tuple consisting of the integer, float,
+    a Boolean, and the array that you previously declared.
+    Print out the tuple in its Debug representation.
+    */
+    let new_val: i32 = 1_337;
+    let new_val_i16: i16 = new_val as i16;
+
+    let float_point_val: f32 = 3.8919;
+    println!("{float_point_val:.3}");
+
+
+    let with_milk: bool = false;
+    let with_sugar: bool = true;
+    let is_my_type_of_coffee: bool = with_milk & with_sugar;
+    let is_acceptable_coffe: bool = with_milk | with_sugar;
+    println!("{is_my_type_of_coffee} and {is_acceptable_coffe}");
+
+    let four_array: [i8; 4] = [0, 4, 1, 9];
+    dbg!(four_array);
+
+    let our_tuple:(i32, f64, bool, [i8; 4]) = (5, 5.2, true, four_array);
+    println!("{our_tuple:?}");
+
+
 
 }
