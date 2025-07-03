@@ -30,7 +30,7 @@ fn main() {
         These are the output of a function. Every Rust function must have a return value
     */
     let new_val: i32 = square_value(3);
-    println!("{new_val}")
+    println!("{new_val}");
 
     /*
         Implicit Return Values
@@ -40,12 +40,54 @@ fn main() {
 
     /*
         The Unit as a Return Type
-        NOTE: Omar Left off here
+        A unit is an empty tuple - a tuple without values. This is the default return value of a function where the return type is not specified
     */
+
+
+    /*
+        Blocks in Functions
+        We can declare a block within a function body. It's not a function, but it is isolated in scope! It's a boundary for the code. It has access to outside variables, but
+        the outside variables do NOT have access to the variables inside the scope! We can create "anonymous" functions in Rust (simlar to lambdas in python) by taking a block and it's output
+        as a variable assignment!
+    */
+
+    let multiplier: i32 = 3;
+    let calculation_result = {
+        let value = 5+4;
+        value*multiplier // not adding a semicolon here means that our return type is the type of the last line. In this case - we have an i32!
+    };
+
+    println!("{calculation_result}");
+
+    /*
+        Project
+    */
+    apply_to_jobs(10, "Data Scientist");
+    let val_9 = is_even(9);
+    let val_8 = is_even(8);
+    println!("9 is even: {val_9}\n\n8 is even: {val_8}");
+
+    println!("{:?}", alphabets("aardvark"));
+    println!("{:?}", alphabets("zoology"));
+    println!("{:?}", alphabets("zebra"));
+
 }
 
-fn square_value(input_value: i32) -> i32 {
-    return input_value.pow(2);
+fn alphabets(input_string: &str) -> (bool, bool){
+    return (input_string.contains('a'), input_string.contains('z'));
+}
+
+fn is_even(input_value: i32) -> bool {
+    return 0 == {
+        input_value % 2
+    }
+}
+
+fn apply_to_jobs(number: i32, title: &str) {
+    println!("I am applying to {number} {title} jobs.");
+}
+
+fn square_value(input_value: i32) -> i32 { return input_value.pow(2);
 }
 
 fn open_store(neighborhood: &str){
