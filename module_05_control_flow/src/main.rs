@@ -74,9 +74,61 @@ fn main() {
 
     /*
         The Loop and Break Keywords
-        
+        We use the "loop" keyword to continuously do a task. We can use an if statement with the "break" keyword to break from the loop
+    */
+    let mut counter = 10;
+    loop {
+        if counter == 0{
+            println!("Blastoff!!!!");
+            break;
+        }
+        println!("{counter}");
+        counter-=1;
+    }
+
+    /*
+        The Continue keyword
+        The "continue" keyword allows us to skip the execution of the rest of the code block and run straight to the next iteration of the loop!    
     */
 
+    counter = 21;
+    loop {
+        if counter == 0 {
+            println!("Blastoff");
+            break;
+        }
+        // We will only print if the counter is modulo 3
+        counter -= 1;
+        if counter % 3 != 0 {
+            continue
+        }
+        println!("{counter} seconds to blastoff . . .");
+    }
+
+    /*
+        The while loop
+
+        We don't need the "break" keyword because the while loop has a mechanism to terminate automatically
+    */
+
+    counter = 21;
+    while counter > 0 {
+        counter -= 1;
+        if counter==0 {
+            println!("Blastoff!!!");
+            continue
+        } else if counter % 3 != 0 {
+            continue
+        }
+
+        println!("{counter} seconds to blastoff . . . ");
+    }
+
+
+    /*
+        Recursion
+        
+    */
 
 
 }
