@@ -127,11 +127,33 @@ fn main() {
 
     /*
         Recursion
-        
+        This is when a function calls itself. To avoid calling itself infinitely, we use the following:
+        - A base case. This allows us to set up the condition to return the final result
+    */
+
+    countdown(5);
+
+    /*
+        Debugging in Rust
+        Note that the debugger in rust let's us view a variable value by typing it "? <variable name>"
+        We can use the "watch" window in vscode to type in an expression related to a variable that will automatically recompute at each iteration when we arrive at a break point.
+        You can also just type in a code expression into the actual code, but that requires recompilation and you have to remember to delete it after the fact
     */
 
 
 }
+
+fn countdown(seconds: i32) {
+    // This function takes in a number of seconds and then recursively performs a coundown sequence!
+    if seconds==0 {
+        println!("Blastoff!!!");
+        return ()
+    }
+    println!("{seconds} to blastoff . . .");
+
+    countdown(seconds-1);
+}
+
 
 fn fun_func(input_var: &str) {
     if input_var == "summer" {
