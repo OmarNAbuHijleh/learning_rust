@@ -141,7 +141,59 @@ fn main() {
     */
 
 
+    let mut color = "green";
+    println!("{color} gives {number}", color=color, number=color_to_number_conditional(color));
+    
+    color="yellow";
+    println!("{color} gives {number}", color=color, number=color_to_number_switch(color));
+
+    color="blue";
+    println!("{color} gives {number}", color=color, number=color_to_number_switch(color));
+
+    println!("factorial of 3 is {}", factorial_calc(4));
+    println!("factorial of 5 is {}", factorial_calc(5));
+    println!("factorial of 10 is {}", factorial_calc(10));
+
+    let mut val_var = 5;
+    let mut running_total = 1;
+    while val_var > 1 {
+        running_total *= val_var;
+        val_var-=1;
+    }
+    println!("\n\n5 factorial gives {running_total}");
+
+
+
 }
+
+fn factorial_calc(input_val: i32) -> i32 {
+    if input_val == 1 {
+        return input_val
+    }
+    return input_val * factorial_calc(input_val-1)
+}
+
+fn color_to_number_conditional(color: &str) -> i8 {
+    if color=="red" {
+        return 1
+    } else if "green" == color {
+        return 2
+    } else if "blue" == color {
+        return 3
+    } else {
+        return 0
+    }
+}
+
+fn color_to_number_switch(color: &str) -> i8 {
+    match color {
+        "red" => 1,
+        "green"=> 2,
+        "blue" => 3,
+        _ => 0
+    }
+}
+
 
 fn countdown(seconds: i32) {
     // This function takes in a number of seconds and then recursively performs a coundown sequence!
