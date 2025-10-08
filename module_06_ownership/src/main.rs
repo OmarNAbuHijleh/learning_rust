@@ -165,6 +165,118 @@ fn main() {
 
     /*
         The Copy Trait with References
+        Stack types implement the copy trait with full copies of the values when needed. This is because stack data is fixed in size. The same rules apply to references
+        References are a type and therefore implement the copy trait as well. 
+    */
+    drop(ice_cream);
+    let ice_cream = "Cookies and Cream";
+    let dessert = ice_cream; // This references the same "Cookies and Cream" text from the binary. The reference is copied in this case, and we have 2 entries in the stack. There is no movement of ownership!
+    println!("{}", ice_cream);
+    println!("{}", dessert); // These are both references to the same memory of the binary, however they are 2 distinct variables and are both on the stack!
+
+    /*
+        Ownership and Function Parameters
+        We've now explored the concepts of copying and moving in ownership. We're going to explore this topic further in regards to function parameters.
+
+        Again, this depends on the type of data being used. Stack data (integers, floats, booleans) - then Rust creates a copy of the data and there is no transfer of ownership.
+        When dealing with heap data, ownership IS transferred.
+    */
+    let input_value = 32;
+    print_my_value(input_value); // Here, we have an actual copy being made since it's a stack entry
+    println!("{input_value}"); // We can see the input_value is still valid here. 
+
+    // Now we'll do the same thing using a string instead
+    let oranges = String::from("Oranges");
+    print_my_string(oranges);
+    // println!("{oranges} is still valid?"); // A string does not implement the copy trait, so it's actually cleared from the heap following the above function call
+    // NOTE: We can fix the problem above by passing in a cloned version of the value!
+
+    /*
+        Mutable Parameters
+
+        Just like variables, function parameters are immutable by default. We can declare them mutable if we like though!
+    */
+    let mut burger = String::from("Burger");
+    // let meal = burger;
+    // meal.push_str(" and Milkshake"); // This line will not work because even though the burger variable is mutable, the meal variable is not!
+    add_fries_2(burger); // Keep in mind that burger is deallocated from memory following this!
+
+
+    /* 
+        Return Values
 
     */
+    let cake = bake_cake(); // A return value allows the deallocation that would have taken place on the heap for the bake_cake() function to a value in the scope that called the function. This also applies to implicit returns
+    println!("I now have a {cake} cake");
+
+    // This can be challenging because now we always need a return statement
+    let current_meal = String::new();
+    let current_meal = add_flour(current_meal); // This will deallocate the text on the heap, so we need to have the return value. This is very inelegant, and this problem will be solved in the next module on References and Borrowing
+    println!("{current_meal}");
+    // add_sugar();
+    // add_salt();
+
+
+    /*
+        Project for this module
+    */
+
+    // Question: Does Rust move ownership for this? No - This is because this is a data type on the stack and therefore a copy will be made instead
+    let is_concert: bool = false;
+    let is_event = is_concert;
+    println!("Concert? {is_concert}\nEvent? {is_event}");
+
+    // Question: Does Rust move ownership for this? No - This is a string literal and is in the binary data in memory (i.e. static memory)
+    let sushi_2 = "Salmon";
+    let dinner_2 = sushi_2;
+    println!("{sushi_2} and {dinner_2}");
+    
+    // Question: Does Rust move ownership for this? Yes - This is because this is a data type on the heap and therefore the sushi ownership will be deallocated
+    let sushi = String::from("Salmon");
+    let dinner = sushi; 
+    // println!("Sushi? {sushi}\nDinner? {dinner}"); 
+
+    // Declaring the eat_meal function that accepts a "meal" parameter of type string
+    let dinner = eat_meal(dinner); // dinner gets deallocated due to the fact it is a heap string and it's ownership is passed into the function. We clear it manually in the function but it would be deallocated regardless
+    println!("Dinner is: {dinner} today right?");
+
+}
+
+fn eat_meal(mut meal: String) -> String {
+    meal.clear();
+    return meal;
+}
+
+fn bake_cake() -> String {
+    let cake = String::from("Chocolate Mousse");
+    return cake;
+}
+
+fn add_flour(mut meal: String) -> String{
+    meal.push_str("Add Flour\n");
+    return meal
+}
+
+fn add_fries(input_string: String){
+    // Add to the input_string that we received
+    // Note that this code does not work. This is because the input is immutable currently. BUT we still have the problem if we make the original variable mutable prior to the function call
+    // The reason it doesn't matter if the variable we pass in is mutable outside the function call is that the variable outside the function call is no longer the owner at that point!
+    // Since we're dealing with a heap allocation, we're dealing with the original data
+    // input_string.push_str(" and Fries"); // This one does not work because "input_string" is not mutable
+}
+
+fn add_fries_2(mut input_string: String){
+    // This is the version with a mutable variable. Here, we can mutate the data in memory!
+    input_string.push_str(" and Fries"); 
+    println!("{input_string}"); // This will work now
+}
+
+fn print_my_string(input_string: String){
+    // Because we receive a Heap-Stored value (in this case - a string) we find that Rust actually drops it from memory following the execution of this function call!
+    println!("You passed in {input_string}");
+}
+
+
+fn print_my_value(value: i32){
+    println!("{value} is my value");
 }

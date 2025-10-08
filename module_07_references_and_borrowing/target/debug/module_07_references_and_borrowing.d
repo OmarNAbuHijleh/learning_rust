@@ -1,0 +1,1 @@
+/Users/omar/Desktop/workspace/learning_rust/module_07_references_and_borrowing/target/debug/module_07_references_and_borrowing: /Users/omar/Desktop/workspace/learning_rust/module_07_references_and_borrowing/src/main.rs

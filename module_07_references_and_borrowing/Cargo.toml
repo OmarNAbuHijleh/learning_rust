@@ -1,0 +1,6 @@
+[package]
+name = "module_07_references_and_borrowing"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
