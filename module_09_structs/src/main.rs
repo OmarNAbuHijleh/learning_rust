@@ -179,8 +179,193 @@ fn main() {
 
     /*
         Methods and Multiple Parameters
-
+        Struct methods - we can have more parameters than just self
     */
+
+    let tmp_song = EminemSong {
+        title: String::from("Without Me"),
+        release_year: 2003,
+        duration_secs: 180,
+    };
+
+    let tmp_song_2 = EminemSong {
+        title: String::from("Lose Yourself"),
+        release_year: 2003,
+        duration_secs: 179,
+    };
+
+    let bool_result = (&tmp_song).is_longer_than(&tmp_song_2);
+    println!(
+        "{} is longer than {}: {}",
+        tmp_song.title, tmp_song_2.title, bool_result
+    );
+
+    /*
+        Calling methods from other methods
+        We can call multiple struct methods in the same struct method
+    */
+    tmp_song_2.years_since_release();
+
+    println!("{:?}", tmp_song_2);
+
+    /*
+        Associated Functions and Constructor Functions
+        These are functions attached to a type
+
+        A type creates what is often referred to as a "namespace" for associated functions. A namespace is a boundary of associated functions. Analagous to a folder and it's file contents
+
+        Examples include String::from() or String::new(). These functions live on the string type
+
+        We often use associated functions for constructors. Constructors are functions that create an instance of the associated type. An example is the String::new() function
+
+        The community convention is to give the constructor the namne "new". Rust will know that it's an associated method if we avoid adding the "self" parameter as an argument into the function
+    */
+
+    let new_song = EminemSong::new(String::from("Not Afraid"), 2010, 240);
+    println!("{:#?}", new_song);
+
+    /*
+        Multiple Impl Blocks
+        A struct can define multiple impl blocks. Rust will combine all the contents into a single type definition. Some concepts in Rust will require this from a technical perspective
+    */
+
+    /*
+        The Builder Pattern
+        This is a design pattern.
+
+        Allows us to chain multiple methods in sequence
+    */
+
+    let mut computer_instance = Computer::new(String::from("i3"), 20, 500);
+    computer_instance
+        .update_cpu(String::from("M4"))
+        .update_memory(32)
+        .upgrade_capacity(1000);
+
+    println!("{:#?}", computer_instance);
+
+    /*
+        Tuple Structs
+        There are 3 types of Structs in Rust - Named Field, Tuple Like, and Unit Like
+        So far, we've been dealing with named field, where the data is associated with a variable name. Now we'll look at Tuple-Like structs
+
+        A tuple struct is a struct that assigns each piece of data an order in line rather than a name
+
+        To declare a struct as tuple like we use the '()' as part of the struct definition with data types defined in the "()"
+
+        We use this because it allows us to ensure that function declarations take the desired type!
+    */
+    let work_shift = ShortDuration(8, 0);
+    println!("{} hours and {} minutes", work_shift.0, work_shift.1);
+
+    let era = LongDuration(5, 3);
+    println!("{} years and {} months", era.0, era.1);
+
+    /*
+        Unit-Like Structs
+        A unit is a tuple that contains no values. A struct without any fields may seem pointless but it has its use cases in design patterns
+    */
+    let val = Empty;
+
+    /*
+        Project
+        Use struct update syntax to copy the `price` and `passengers`
+        fields to a new Flight struct instance. Make sure to provide
+        new Strings for the remaining fields to ensure ownership
+        doesn't transfer. Assign the new Flight to a separate variable.
+    */
+
+    let mut flight_instance = Flight::new(
+        String::from("America"),
+        String::from("Palestine"),
+        500.0,
+        500,
+    );
+    flight_instance
+        .change_destination(String::from("Mecca"))
+        .increase_price()
+        .itinerary();
+    println!("{:#?}", flight_instance);
+
+    let new_flight_instance = Flight {
+        origin: String::from("Canada"),
+        destination: String::from("America"),
+        ..flight_instance
+    };
+    println!("{:#?}", new_flight_instance);
+}
+
+#[derive(Debug)]
+struct Flight {
+    origin: String,
+    destination: String,
+    price: f64,
+    passengers: u32,
+}
+
+impl Flight {
+    fn new(origin: String, destination: String, price: f64, passengers: u32) -> Self {
+        return Self {
+            origin,
+            destination,
+            price,
+            passengers,
+        };
+    }
+
+    fn change_destination(&mut self, new_destination: String) -> &mut Self {
+        self.destination = new_destination;
+        return self;
+    }
+
+    fn increase_price(&mut self) -> &mut Self {
+        self.price *= 1.2;
+        return self;
+    }
+
+    fn itinerary(&self) -> &Self {
+        println!("{} -> {}", self.origin, self.destination);
+        return self;
+    }
+}
+
+struct Empty; // a unit like struct
+
+// Hours and minutes
+struct ShortDuration(u32, u32); // A tuple like struct
+// Years and Months
+struct LongDuration(u32, u32);
+
+#[derive(Debug)]
+struct Computer {
+    cpu: String,
+    memory: u32,
+    hard_drive_capacity: u32,
+}
+
+impl Computer {
+    fn new(cpu: String, memory: u32, hard_drive_capacity: u32) -> Self {
+        return Self {
+            cpu,
+            memory,
+            hard_drive_capacity,
+        };
+    }
+
+    fn update_cpu(&mut self, new_cpu: String) -> &mut Self {
+        self.cpu = new_cpu;
+        return self; // Note that returning the struct reference is what allows us to chain multiple methods together (Builder Pattern)
+    }
+
+    fn update_memory(&mut self, new_amount: u32) -> &mut Self {
+        self.memory = new_amount;
+        return self;
+    }
+
+    fn upgrade_capacity(&mut self, new_amount: u32) -> &mut Self {
+        self.hard_drive_capacity = new_amount;
+        return self;
+    }
 }
 
 #[derive(Debug)]
@@ -192,6 +377,25 @@ struct EminemSong {
 
 // This is where we declare all of our methods for our struct. We do this so that we have them all in one place
 impl EminemSong {
+    fn new(title: String, release_year: u32, duration_secs: u32) -> Self {
+        //We can also replace "Self" with "EminemSong" here. this is for both the return type and the struct call
+        return Self {
+            title,
+            release_year,
+            duration_secs,
+        };
+    }
+}
+
+impl EminemSong {
+    fn years_since_release(&self) {
+        self.display_song_info_3();
+        let num_years_since_release = self.calc_years_since_release();
+        println!("Years since release {}", num_years_since_release);
+    }
+    fn calc_years_since_release(&self) -> u32 {
+        return 2025 - self.release_year;
+    }
     fn display_song_info(self: Self) {
         // Can also just be "self" for the argument
         // "self" will represent a struct in some way
@@ -260,6 +464,15 @@ impl EminemSong {
             "{} was released {} and is {} long.",
             self.title, self.release_year, self.duration_secs
         );
+    }
+
+    fn is_longer_than(self: &Self, other_song: &EminemSong) -> bool {
+        // Arguments can also be (&self, other_song: &Self) where "&Self" let's us know it's in reference to the struct "EminemSong"
+        if self.duration_secs > other_song.duration_secs {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
