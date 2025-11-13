@@ -1,5 +1,58 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+   0.021100400s  INFO prepare_target{force=false package_id=module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing) target="module_07_references_and_borrowing"}: cargo::core::compiler::fingerprint: fingerprint error for module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing)/Check { test: false }/TargetInner { name: "module_07_references_and_borrowing", doc: true, ..: with_path("C:\\Users\\omara\\OneDrive\\Desktop\\workspace\\learning_rust\\module_07_references_and_borrowing\\src\\main.rs", Edition2024) }
+   0.021169300s  INFO prepare_target{force=false package_id=module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing) target="module_07_references_and_borrowing"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing\target\debug\.fingerprint\module_07_references_and_borrowing-8a1dbc8a8d41f9a6\bin-module_07_references_and_borrowing`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.036945700s  INFO prepare_target{force=false package_id=module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing) target="module_07_references_and_borrowing"}: cargo::core::compiler::fingerprint: fingerprint error for module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing)/Check { test: true }/TargetInner { name: "module_07_references_and_borrowing", doc: true, ..: with_path("C:\\Users\\omara\\OneDrive\\Desktop\\workspace\\learning_rust\\module_07_references_and_borrowing\\src\\main.rs", Edition2024) }
+   0.036983100s  INFO prepare_target{force=false package_id=module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing) target="module_07_references_and_borrowing"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing\target\debug\.fingerprint\module_07_references_and_borrowing-3aa888740ae4dddc\test-bin-module_07_references_and_borrowing`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+    Checking module_07_references_and_borrowing v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_07_references_and_borrowing)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s

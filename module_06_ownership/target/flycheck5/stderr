@@ -1,5 +1,58 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
+   0.021253200s  INFO prepare_target{force=false package_id=module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership) target="module_06_ownership"}: cargo::core::compiler::fingerprint: fingerprint error for module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership)/Check { test: false }/TargetInner { name: "module_06_ownership", doc: true, ..: with_path("C:\\Users\\omara\\OneDrive\\Desktop\\workspace\\learning_rust\\module_06_ownership\\src\\main.rs", Edition2024) }
+   0.021301800s  INFO prepare_target{force=false package_id=module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership) target="module_06_ownership"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership\target\debug\.fingerprint\module_06_ownership-bb8a6b97538289af\bin-module_06_ownership`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.049736100s  INFO prepare_target{force=false package_id=module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership) target="module_06_ownership"}: cargo::core::compiler::fingerprint: fingerprint error for module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership)/Check { test: true }/TargetInner { name: "module_06_ownership", doc: true, ..: with_path("C:\\Users\\omara\\OneDrive\\Desktop\\workspace\\learning_rust\\module_06_ownership\\src\\main.rs", Edition2024) }
+   0.049800800s  INFO prepare_target{force=false package_id=module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership) target="module_06_ownership"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership\target\debug\.fingerprint\module_06_ownership-8b38c73870e41806\test-bin-module_06_ownership`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+    Checking module_06_ownership v0.1.0 (C:\Users\omara\OneDrive\Desktop\workspace\learning_rust\module_06_ownership)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.51s

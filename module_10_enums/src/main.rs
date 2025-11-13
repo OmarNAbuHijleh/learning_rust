@@ -1,6 +1,53 @@
-use std::slice::Windows;
-
 // Module 10: Enums
+
+use std::ops::Sub;
+
+#[derive(Debug)]
+enum Tier {
+    Gold,
+    Silver,
+    Platinum,
+}
+
+#[derive(Debug)]
+enum Subscription {
+    Free,
+    Basic(f64, u32), // price per month and number of months, respectively
+    Premium{tier: Tier},
+}
+
+impl Subscription {
+    fn summarize(&self) {
+        if let Subscription::Free = self {
+            println!("You have limited access to the site");
+            return
+        }
+        if let Subscription::Basic(price_per_month, num_months) = self {
+            println!("You have limited access to the site's premium features for {price_per_month} dollars per month for {num_months} months");
+            return
+        }
+        if let Subscription::Premium { tier} = self {
+            println!("You have the {:?} tier", tier);
+            return 
+        }
+    }
+    
+    fn summarize2(&self) {
+        match self {
+            Subscription::Free => {
+                println!("You have limited access to the site");
+            }
+            Subscription::Basic(price_per_month, num_months) => {
+                println!("You have limited access to the site's premium features for {price_per_month} dollars per month for {num_months} months");
+            }
+            Subscription::Premium { tier} => {
+                println!("You have the {:?} tier", tier);
+            }
+        }
+    }
+}
+
+
 #[derive(Debug)]
 enum CardSuit {
     Hearts,
@@ -47,13 +94,112 @@ enum RestarauntItem {
     Bowl(Meat, Bean),
     VeganPlate(Bean),
 }
+
+
 #[derive(Debug)]
 enum OperatingSystems {
     MacOS (String), // This is going to say the macOS version
     Linux {distribution: String},
     Windows,
 }
+
+impl OperatingSystems {
+    fn years_since_OS_release(self: &Self) -> u32 { // We make an immutable reference to the enum instance
+        match self {
+            OperatingSystems::Windows => { // We can do this since we don't have any sort of associated data
+                println!("This is an old operating systems");
+                39 // NOTE: notice here we're using an implicit return such that the block returns the same datatype as the other following cases in our match statement!
+            },
+            OperatingSystems::Linux {distribution} => { // We have to use the name of the associated data
+                // the "distribution" keyword is accessible from here!
+                println!("The linux distribution being used is {:?}", distribution);
+                34           
+            }  
+            OperatingSystems::MacOS(mac_os_version_string)=> { // We decide what name we want to assign the associated data
+                //Here, name_used is of type String and is something we can use in this code block. We assigned "mac_os_version_string" for the first associated data that is part of the MacOS variant
+                println!("We're using MacOS version {:?}", mac_os_version_string);
+                23
+            } 
+        }
+    }
+}
+
+# [derive(Debug)]
+enum OnlineOrderStatus {
+    Ordered,
+    Packed,
+    Deliverd,
+    Shipped,
+}
+
+impl OnlineOrderStatus {
+    fn check(&self) {
+        match self {
+            OnlineOrderStatus::Deliverd => {
+                println!("Your online order is delivered");
+            }
+            _ => {
+                println!("Your item has not arrived yet");
+            }
+        }
+    }
+
+    
+    fn check2(&self) {
+        match self {
+            OnlineOrderStatus::Ordered | OnlineOrderStatus::Packed => { // NOTE: Multiple variants at once
+                println!("Your item is being prepped for shipment")
+            }  
+            other_online_status => { 
+                // NOTE: here, "other_online_status" is an alias for all other variants
+                println!("The online order status is {:?}", other_online_status);
+
+            }
+        }
+    }
+}
+
+
+enum Milk {
+    Lowfat(i32),
+    Whole,
+    Nondairy {milk_type: String},
+}
+
+impl Milk{
+    fn drink(self) {
+        match self {
+            Milk::Lowfat(2) => { // NOTE: This is an even more specific match, so the matching will only be performed in this case on that specific value for the associated data!
+                println!("This is 2% lowfat milk");
+            }
+            Milk::Lowfat(percentage_fat) => { // NOTE: "percentage_fat" serves as a catch_all for the other possible values that can be taken. This is going to be required by the Rust compiler to keep it happy!
+                println!("You have the lowfat {:?}", percentage_fat);
+            }
+            Milk::Whole => {
+                println!("This is whole milk");
+            }
+            Milk::Nondairy { milk_type } => {
+                println!("Your milk is {}", milk_type);
+            }
+        }
+    }
+}
+
 fn main() {
+
+    /*
+        Project
+    */
+    Subscription::Free.summarize();
+    Subscription::Basic(30.0, 12).summarize();
+    Subscription::Premium { tier: Tier::Gold }.summarize();
+
+
+    Subscription::Free.summarize2();
+    Subscription::Basic(30.0, 12).summarize2();
+    Subscription::Premium { tier: Tier::Gold }.summarize2();
+
+    
     /*
         Intro to Enums
 
@@ -133,6 +279,11 @@ fn main() {
         The match keyword compares a given value against a collection of patterns and executes a block of code based on the first pattern (also known as an "arm") that matches
 
         Match is good for covering all possible cases of enums! 
+
+
+        The Match keyword can also cover multiple values! There are multiple ways to accomplish this.
+
+        We can also match on specific associated data!
      */
     let input_integer = 50;
     match input_integer{
@@ -140,16 +291,79 @@ fn main() {
         8 => println!("The number is 8"),
         _ => println!("The number is not 5 or 8"), // The catch all pattern that will always match
     }
+    println!("\n");
 
     // If we have an enum variant that stores some associated data, we can access that data in the match arms. There will be a different syntax for a tuple variant vs a struct variant in those cases though!
     println!("My computer is {:?}", years_since_OS_release(OperatingSystems::Windows));
     println!("My computer is {:?}", years_since_OS_release(OperatingSystems::MacOS(String::from("Sequoia"))));
     println!("My computer is {:?}", years_since_OS_release(OperatingSystems::Linux{distribution: String::from("Fedora")}));
-    
+    // ---------------------------------------------
+    OnlineOrderStatus::Deliverd.check(); // We can have a single catchall or we can catch multiple variants at once
+    OnlineOrderStatus::Ordered.check2();
+    OnlineOrderStatus::Shipped.check2();
+
+    println!("\n");
+    Milk::Lowfat(2).drink();
+    Milk::Lowfat(20).drink();
+    Milk::Whole.drink();
+
+    println!("\n");
+
     /*
         Defining Methods on Enums
+        Like with Structs, we can define methods on our keywords by using the "impl" keyword
 
-     */ 
+    */ 
+    OperatingSystems::Windows.years_since_OS_release();
+    OperatingSystems::MacOS(String::from("Sequioa")).years_since_OS_release();
+    OperatingSystems::Linux { distribution: String::from("Fedora") }.years_since_OS_release();
+
+    /*
+        The "if let" Construct
+        The difficulty with using "Match" is that it can be exhaustive. We can solve for testing one variant by using the "if let"
+     */
+
+    let my_milk = Milk::Whole;
+    if let Milk::Whole = my_milk {
+        println!("You have whole milk");
+    }
+    
+    let my_milk = Milk::Lowfat(2);
+    if let Milk::Whole = my_milk {
+        println!("You have whole milk");
+    } 
+    if let Milk::Lowfat(percent) = my_milk { // We can use the "percent" variable temporarily to represent the associated data for my_milk if it's lowfat
+        println!("You have {} milk", &percent);
+    }
+    let my_milk = Milk::Nondairy { milk_type: String::from("Almond") };
+    if let Milk::Nondairy { milk_type } = my_milk { // NOTE: This is the struct version of what we're doing
+        println!("You have {milk_type}");
+    }
+
+    /*
+        The "let else" statement
+        This provides a route for if something is not the case. The way in which it is written is a bit awkward
+     */
+
+    println!("\n\n\n\n");
+    // NOTE: the "percent" variable carries down after the statement because we have defined it by useing the let else!
+    let my_milk = Milk::Lowfat(10);
+    let Milk::Lowfat(percent) = my_milk else { // NOTE: This function block executes if our variant is not the same as our data type!
+        println!("You do not have the low fat milk");
+        return;                
+    }; 
+    println!("You have the {percent} milk");
+    
+    println!("\n\n\n\n");
+    // NOTE: The "percent" variable does not carry down as a result of the "let else". This forces us to terminate our program early and avoid any issues with the declaration of percent2
+    let my_milk = Milk::Nondairy{milk_type: String::from("Almond")};
+    let Milk::Lowfat(percent2) = my_milk else { // NOTE: This function block executes if our variant is not the same as our data type!
+        println!("You do not have the low fat milk");
+        return; // NOTE: !!!!!!!!!!!!!!!!!!!! We Return early because the percent variable is not defined for the rest of the program!
+    }; 
+    println!("You have the {percent2} milk");
+
+
 
 }
 
