@@ -1,0 +1,1 @@
+/Users/omar/Desktop/workspace/learning_rust/module_12_option_and_result_enums/target/debug/module_12_option_and_result_enums: /Users/omar/Desktop/workspace/learning_rust/module_12_option_and_result_enums/src/main.rs
