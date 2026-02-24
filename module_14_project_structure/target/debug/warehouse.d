@@ -1,0 +1,1 @@
+/Users/omar/Desktop/workspace/learning_rust/module_14_project_structure/target/debug/warehouse: /Users/omar/Desktop/workspace/learning_rust/module_14_project_structure/src/inventory.rs /Users/omar/Desktop/workspace/learning_rust/module_14_project_structure/src/main.rs /Users/omar/Desktop/workspace/learning_rust/module_14_project_structure/src/orders/mod.rs

@@ -1,0 +1,1 @@
+/Users/omar/Desktop/workspace/learning_rust/fitness/target/debug/libfitness.rlib: /Users/omar/Desktop/workspace/learning_rust/fitness/src/cardio/mod.rs /Users/omar/Desktop/workspace/learning_rust/fitness/src/lib.rs /Users/omar/Desktop/workspace/learning_rust/fitness/src/weightlifting.rs
