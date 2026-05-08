@@ -20,18 +20,29 @@
 */
 
 /*
-    Access a Value by Key
-    We can access a value by using the square bracket notation and passing in the key (similar to python). The problem with this is that if the key doesn't exist, we'll have
-    a run time panic. To avoid this, we can use the get method, which returns an Option enum (None or Some)
- */
+   Access a Value by Key
+   We can access a value by using the square bracket notation and passing in the key (similar to python). The problem with this is that if the key doesn't exist, we'll have
+   a run time panic. To avoid this, we can use the get method, which returns an Option enum (None or Some)
+*/
 
 /*
- *  Overwriting a Value with an Existing Key
-    Using the insert method, we can replace the prior key
- */
+*  Overwriting a Value with an Existing Key
+   Using the insert method, we can replace the prior key
+*/
 
 /*
     The entry method
+    The entry method accepts a hashmap key and returns an enum called "Entry" representing the possibility that the enum exists or does not exist
+
+    The "occupied" and the "vacant" entries are the enum value results
+    "occupied" will store the key and value. Vacant will just store the key
+    The "or_insert" method can be used to store the key and a value if it is vacant!
+
+    NOTE; The results of the "or_insert" will be the value (default or existing)
+*/
+
+/*
+    The Hash Set
 
 */
 
@@ -90,4 +101,17 @@ fn main() {
     println!("Before: {:?}", coffee_pairings);
     coffee_pairings.insert(&drink, String::from("Hot Chocolate"));
     println!("After: {:?}", coffee_pairings);
+
+    // The entry method
+    println!("The Entry Method");
+    let vacant_result = String::from("Vacant Result");
+    let expected_occupied_type = coffee_pairings
+        .entry(&drink)
+        .or_insert(String::from("Almond Milk"));
+    println!("{:?}", &expected_occupied_type);
+    let expected_vacant_type = coffee_pairings
+        .entry(&vacant_result)
+        .or_insert(String::from("Almond Milk"));
+    println!("{:?}", &expected_vacant_type);
+    println!("{:?}", coffee_pairings);
 }
