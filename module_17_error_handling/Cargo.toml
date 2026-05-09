@@ -1,5 +1,5 @@
 [package]
-name = "module_17_the_panic_macro"
+name = "module_17_error_handling"
 version = "0.1.0"
 edition = "2024"
 
