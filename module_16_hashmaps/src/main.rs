@@ -43,10 +43,16 @@
 
 /*
     The Hash Set
-
+    This is often times just a 'set' in other languages. It is in the collections module
 */
 
+/*
+ * PROJECT
+
+ */
+
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn main() {
     println!("Adding to Hashmap");
@@ -114,4 +120,73 @@ fn main() {
         .or_insert(String::from("Almond Milk"));
     println!("{:?}", &expected_vacant_type);
     println!("{:?}", coffee_pairings);
+
+    // The hash set
+    println!("The Hash Set");
+    let mut concert_queue: HashSet<&str> = HashSet::new();
+    println!("{:?}", concert_queue);
+    concert_queue.insert("Omar");
+    println!("{:?}", concert_queue);
+    println!("{:?}", concert_queue.len());
+    concert_queue.insert("Omar"); // This won't do anything because the entry is already present
+    concert_queue.remove("Omar"); // Will return a boolean "True" if it exists and is removed and "False" otherwise
+
+    concert_queue.insert("Omar"); // This won't do anything because the entry is already present
+    concert_queue.contains("Omar"); // This will return "true" or "false"
+
+    println!("{:?}", concert_queue.get("Omar")); // This will give the "Some" variant if it exists and "None" otherwise
+
+
+    // The hash set operations
+    println!("Hash Set Operations");
+    // These let us compare sets together
+    let mut movie_queue: HashSet<&str> = HashSet::new();
+    let mut concert_queue: HashSet<&str> = HashSet::new();
+
+    concert_queue.insert("Boris");
+    concert_queue.insert("Melissa");
+
+
+    movie_queue.insert("Boris");
+    movie_queue.insert("Phil");
+
+    // Note that this is UNORDERED
+    println!("{:?}", movie_queue.union(&concert_queue)); // A union. Note that the union is a new set, it doesn't affect the original sets. Note that this is a special struct called "Union".
+    println!("{:?}", movie_queue);
+
+    println!("{:?}", movie_queue.difference(&concert_queue)); // A difference
+
+    println!("{:?}", movie_queue.symmetric_difference(&concert_queue)); // A symmetric difference - gets the values that are in one set or the other but not both.
+
+    println!("{:?}", movie_queue.is_disjoint(&concert_queue)); // gives boolean "true" if there is absolutely no overlap between the two sets, "false" otherwise.
+
+    println!("{:?}", movie_queue.is_subset(&concert_queue)); // gives boolean "true" if concert_queue contains all the values in movie_queue, "false" otherwise.
+
+    println!("{:?}", movie_queue.is_superset(&concert_queue)); // gives boolean "true" if movie_queue contains all the values in concert_queue, "false" otherwise.
+
+
+
+    println!("PROJECT");
+    let mut sauces_to_meals: HashMap<&str, Vec<&str>> = HashMap::from(
+        [
+            ("Ketchup", vec!["French Fries", "Burgers", "Hot Dogs"]),
+            ("Mayonnaise", vec!["Sandwiches", "Burgers", "Coleslaw"]),
+            ("Mustard", vec!["Hot dog", "Burgers", "Pretzels"])
+        ]
+    );
+
+    println!("{:?}", sauces_to_meals);
+
+
+    let result = sauces_to_meals.remove("Mayonnaise");
+    println!("{:?}", result);
+
+    let result = sauces_to_meals.get("Mustard");
+    println!("{:?}", result);
+
+    sauces_to_meals.entry("Soy Sauce").or_insert(vec!["Sushi", "Dumplings"]);
+
+
+    println!("{:?}", sauces_to_meals);
+
 }
