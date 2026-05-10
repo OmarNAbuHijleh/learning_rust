@@ -25,16 +25,55 @@ The convention is that if there is an exit code of 0, the program exited gracefu
 
 /*
  * Standard Error (eprintln! macro)
+ The "e" in eprintln stands for error. Standard output vs error output is that standard output is for users and error output is for the program itself.
+
+ The eprintln! macro lets us print to a different channel. For example, if in the terminal we decide to save the output using "cargo run > output.txt", we'll see the error printed out on the terminal but not the normal text!
+ */
+
+ /*
+  * Opening a File
+  */
+
+/*
+ * Asking the User for Input
+ */
+
+/*
+ * Reading the File's Contents
+ *
  */
 use std::process::exit;
+use std::fs::File;
+use std::io::stdin;
 fn main() {
     println!("The panic macro");
     // None.unwrap(); // This will cause a panic, as it only works on the "Some" variant and not the "None" variant
     // panic!("Something went wrong"); // This is an example of a panic
 
     println!("The process module and the exit function");
-    exit(0); // This will exit the program gracefully
-    println!("This will not be printed"); // This will throw a warning from the compiler, as it is unreachable
+    // exit(0); // This will exit the program gracefully
+    // println!("This will not be printed"); // This will throw a warning from the compiler, as it is unreachable
 
     println!("Standard Error (eprintln! macro)");
+    eprintln!("This is an error message!");
+
+    println!("Opening a File");
+    let file = File::open("story.txt"); // This is a result enum. Either Ok or Err depending on how it did in opening the file
+    let failed_open = File::open("nonsense.txt"); // This will give an Err.
+    println!("{file:#?}"); // Reads the file contents
+
+    println!("Asking the User for Input");
+    println!("Please enter the name of the file you would like to read.");
+    let mut input = String::new();
+    let requested_file_status = stdin().read_line(&mut input);
+    let file = match File::open(input.trim()) { // The "input.trim()" removes the newline character from the input
+        Ok(file) => file,
+        Err(err) => {
+            eprintln!("Failed to Open File --> Error: {err}");
+            exit(1)
+        }
+    };
+    println!("{:#?}", file);
+
+    println!("Reading the File's Contents");
 }
