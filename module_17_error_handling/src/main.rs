@@ -49,10 +49,26 @@ The convention is that if there is an exit code of 0, the program exited gracefu
 
  /*
   * Understanding Error Type Redeclaration
+    Rust's standard library includes many different error types that are used to represent different kinds of errors that can occur during program execution.
+    The examples we have in this one are io errors, but you can have others like the fmt errors.
   */
+
+ /*
+ * The ? Operator (The Try Operator)
+ * Rust offers a special operator to propogate errors in a concise way. This is the '?' operator.
+ */
+/*
+ * The read_to_string Associated Function
+   There's a simpler way to do everything we've done already.
+ */
+
+/*
+ * Using ? with Option
+ * We can use the ? operator with the Option types to propogate errors in a concise way.
+ */
 use std::process::exit;
-use std::fs::File;
-use std::io::{self, stdin, Read};
+use std::fs::{self, File}; // This is the file system module
+use std::io::{stdin, Read};
 
 fn main() {
     println!("The panic macro");
@@ -100,7 +116,44 @@ fn main() {
         Err(contents) => println!("Error --> {contents}")
     };
 
-    println!("Understanding Error Type Redeclaration");
+    println!("The ? Operator (The Try Operator)"); // Look for the operator in the "read_file" function
+
+    println!("The read_to_string Associated Function");
+    let res = read_file2();
+    if let Err(err) = res {
+        eprintln!("Error for readfile2 --> {err}");
+        exit(1);
+    }
+    println!("{:?}", res.unwrap());
+
+    println!("Using ? with Option");
+    let mut animals = vec!["Giraffe", "Monkey", "Elephant"];
+    let length_value = length_of_last_element(&mut animals);
+    println!("{:?}", length_value );
+
+    println!("Project Results");
+    let result = write_to_file();
+    match result {
+        Ok(file_name) => println!("Successfully wrote to the file {file_name}"),
+        Err(err) => {
+            eprintln!("Error writing to file: {err}");
+            exit(1);
+        }
+    }
+
+    println!("If you're seeing this file, everything worked!");
+}
+
+fn write_to_file() -> Result<String, std::io::Error> {
+    println!("What would you like the file name to be?");
+    let mut file_name = String::new();
+    stdin().read_line(&mut file_name)?;
+    println!("What would you like to write to the file {}?", file_name.trim());
+    let mut file_contents_to_write = String::new();
+    stdin().read_line(&mut file_contents_to_write)?;
+
+    fs::write(&file_name, &file_contents_to_write)?;
+    return Ok(file_name);
 }
 
 fn read_file() -> Result<String, std::io::Error> {
@@ -108,12 +161,12 @@ fn read_file() -> Result<String, std::io::Error> {
 
     println!("Enter the name of the file you would like to read.");
     let mut input = String::new();
-    let requested_file = stdin().read_line(&mut input);
-    if let Err(err) = requested_file {
-        return Err(err);
-        // eprintln!("Failed to read input --> Error: {err}");
-        // exit(1);
-    }
+    let requested_file = stdin().read_line(&mut input)?; //NOTE: This is an example of the ? operator. When we use this, if we get an error the function automatically returns it, otherwise it just assigns the Ok value to the variable!
+    // if let Err(err) = requested_file {
+    //     return Err(err);
+    //     // eprintln!("Failed to read input --> Error: {err}");
+    //     // exit(1);
+    // }
 
     println!("Opening the File");
     let file = File::open(input.trim());
@@ -132,7 +185,24 @@ fn read_file() -> Result<String, std::io::Error> {
         // exit(1);
     }
 
+    // We can also do this instead of the stuff above:
+    /*
+    let mut file_contents = String::new();
+    File::open(input.trim())?.read_to_string(&mut file_contents)?; // NOTE: We have the ? operator here twice!
+     */
+
     println!("file_contents {file_contents}");
     return Ok(file_contents);
+}
 
+fn read_file2() -> Result<String, std::io::Error> {
+    println!("The second read_file function!");
+    let mut input = String::new();
+    stdin().read_line(&mut input)?;
+    return fs::read_to_string(input.trim()); // Reads the entirety of a file's contents into a string
+}
+
+fn length_of_last_element(input: &mut Vec<&str>) -> Option<usize> {
+    let last_element = input.pop()?; // This returns an Option (some or none)
+    return Option::Some(last_element.len());
 }
