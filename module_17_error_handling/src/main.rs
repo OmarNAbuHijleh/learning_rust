@@ -40,11 +40,20 @@ The convention is that if there is an exit code of 0, the program exited gracefu
 
 /*
  * Reading the File's Contents
- *
  */
+
+ /*
+ * Propogating Errors
+ * To propogate an error is to send it up so that it is handled by a higher-level piece of code. For example, if a function calls another function that returns an error, the error can be delivered by the calling function even if it occurs in the called function.
+ */
+
+ /*
+  * Understanding Error Type Redeclaration
+  */
 use std::process::exit;
 use std::fs::File;
-use std::io::stdin;
+use std::io::{self, stdin, Read};
+
 fn main() {
     println!("The panic macro");
     // None.unwrap(); // This will cause a panic, as it only works on the "Some" variant and not the "None" variant
@@ -66,7 +75,7 @@ fn main() {
     println!("Please enter the name of the file you would like to read.");
     let mut input = String::new();
     let requested_file_status = stdin().read_line(&mut input);
-    let file = match File::open(input.trim()) { // The "input.trim()" removes the newline character from the input
+    let mut file = match File::open(input.trim()) { // The "input.trim()" removes the newline character from the input
         Ok(file) => file,
         Err(err) => {
             eprintln!("Failed to Open File --> Error: {err}");
@@ -76,4 +85,54 @@ fn main() {
     println!("{:#?}", file);
 
     println!("Reading the File's Contents");
+    let mut file_contents = String::new();
+    let read_operation = &file.read_to_string(&mut file_contents);
+    if let Err(err) = read_operation {
+        eprintln!("Failed to read the file --> Error: {err}");
+        exit(1)
+    }
+    println!("{:#?}", file_contents);
+
+    println!("Propogating Errors");
+    let result_propogated = read_file();
+    match result_propogated {
+        Ok(contents) => println!("{:?}", contents),
+        Err(contents) => println!("Error --> {contents}")
+    };
+
+    println!("Understanding Error Type Redeclaration");
+}
+
+fn read_file() -> Result<String, std::io::Error> {
+    println!("Running the \"read_file\" function");
+
+    println!("Enter the name of the file you would like to read.");
+    let mut input = String::new();
+    let requested_file = stdin().read_line(&mut input);
+    if let Err(err) = requested_file {
+        return Err(err);
+        // eprintln!("Failed to read input --> Error: {err}");
+        // exit(1);
+    }
+
+    println!("Opening the File");
+    let file = File::open(input.trim());
+    if let Err(error) = file {
+        return Err(error);
+        // eprintln!("Failed to open file --> Error: {error}");
+        // exit(1);
+    }
+
+    println!("Reading the File's Contents");
+    let mut file_contents = String::new();
+    let read_file = file.unwrap().read_to_string(&mut file_contents);
+    if let Err(err) = read_file {
+        return Err(err);
+        // eprintln!("Failed to read the file contents --> Error: {err}");
+        // exit(1);
+    }
+
+    println!("file_contents {file_contents}");
+    return Ok(file_contents);
+
 }
