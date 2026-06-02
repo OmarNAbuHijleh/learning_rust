@@ -1,0 +1,1 @@
+/Users/omar/Desktop/workspace/learning_rust/module_18_traits_part2/target/debug/libmodule_18_traits_part2.rlib: /Users/omar/Desktop/workspace/learning_rust/module_18_traits_part2/src/lib.rs /Users/omar/Desktop/workspace/learning_rust/module_18_traits_part2/src/lodging/mod.rs /Users/omar/Desktop/workspace/learning_rust/module_18_traits_part2/src/utils.rs
