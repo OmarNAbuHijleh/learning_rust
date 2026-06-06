@@ -60,11 +60,35 @@
 
 /*
  * Implementing the Copy Trait
+ The copy trait is a subtrait of the clone supertrait. If a type chooses to implement the copy trait, we don't need to define any additional methods. If a type chooses to implement "Copy" it must implement the "Clone" supertrait.
+  */
+
+/*
+ * Implementing the PartialEq trait for Structs
  */
 
 use std::fmt::{Debug, Display, Formatter, Result};
 use std::ops::Drop; // May be in the prelude but we'll do this anyway
 use std::clone::{self, Clone}; // This is in the rust prelude but we're including it anyway
+
+# [derive(Debug, Clone)] // Here, "Duration" is implementing the "Clone" supertrait
+struct Duration {
+    hours: u32,
+    minutes: u32,
+    seconds: u32
+}
+
+impl Copy for Duration {}
+
+impl Duration {
+    fn new(hours: u32, minutes: u32, seconds: u32) -> Self { // This is an example where the clone gives back a new data stored on the stack, because it's sub-components are stack data types
+        Self {
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds
+        }
+    }
+}
 
 # [derive(Debug, Clone)]
 struct Appointment {
@@ -248,4 +272,15 @@ fn main() {
 
 
     println!("Implementing the Copy Trait");
+    let one_hour = Duration::new(1, 0, 0); // Hours minutes seconds
+    // let another_hour = one_hour; // Here, ownership will move
+    // println!("{one_hour}"); // This won't work because ownership has transferred
+
+    let another_hour = one_hour.clone(); // Here, we don't have to worry about any issues with ownership moving. NOTE: We could also just implement the Copy trait and then whenever we use the "=" we'll automatically have movement!
+    println!("{:?}", one_hour);
+
+    let yet_another_hour = one_hour; // If we have the Copy trait implemented, problem solved automatically in situations that involve ownership
+    println!("{:?}", one_hour);
+
+    println!("Implementing the PartialEq trait for Structs");
 }
