@@ -52,13 +52,43 @@
  */
 
 /*
- * The Copy Trait
+ * The Clone Trait
+ The clone trait indicates that we can make a duplicate of a type. It makes a full duplicated copy
+
+ NOTE: Instead of going through and defining the clone implementation in the manner we did, we can simply derive the trait the way we do the debug trait!
+ */
+
+/*
+ * Implementing the Copy Trait
  */
 
 use std::fmt::{Debug, Display, Formatter, Result};
-use std::fs; // filesystem module
 use std::ops::Drop; // May be in the prelude but we'll do this anyway
+use std::clone::{self, Clone}; // This is in the rust prelude but we're including it anyway
 
+# [derive(Debug, Clone)]
+struct Appointment {
+    doctor: String,
+    start_time: String,
+    end_time: String
+}
+
+// NOTE: The below code is valid but not necessarily needed. We are using the "Clone" derviation to acheive the same result!
+// impl Clone for Appointment {
+//     fn clone(&self) -> Self {
+//         Self {doctor: self.doctor.clone(), start_time: self.start_time.clone(), end_time: self.end_time.clone()}
+//     }
+// }
+
+impl Appointment {
+    fn new(doctor: &str, start_time: &str, end_time: &str) -> Self {
+        return Self { doctor: doctor.to_string(), start_time: start_time.to_string(), end_time: end_time.to_string() };
+    }
+
+    fn change_start_time(&mut self, new_time: &str) {
+        self.start_time = new_time.to_string();
+    }
+}
 
 enum AppleType {
     RedDelicious,
@@ -203,6 +233,19 @@ fn main() {
     println!("Implementing the Drop Trait"); // NOTE: We can see that because we implemented a println as part of the drop statement that at the end of the program when the apple struct we created goes out of scope
 
 
-    println!("The Copy Trait");
+    println!("The Clone Trait");
+    let morning_appointment = Appointment::new("Dr. Alashwal", "9:00 AM", "10:00 AM");
+    let mut cloned_appointment = morning_appointment.clone(); // NOTE the manner in which we created this clone implementation completely decouples the two - we can edit this version without touching the original
 
+
+    println!("{:#?}", morning_appointment);
+    println!("{:#?}", cloned_appointment);
+
+    cloned_appointment.change_start_time("8:30");
+    println!("After cloning and changing the times . . . ");
+    println!("{:#?}", morning_appointment);
+    println!("{:#?}", cloned_appointment);
+
+
+    println!("Implementing the Copy Trait");
 }
