@@ -40,10 +40,25 @@
 
 /*
  * Formatter Methods
+ This is another way we can deal with returning our display or debug
  */
 
+/*
+ * Implementing the Drop Trait
+ Many rust types allocate memory on the heap and the owner is responsible for deallocating when going out of scope. This is the "Drop" trait that handles the memory deallocation
 
- use std::fmt::{Debug, Display, Formatter, Result};
+ For instance, say we have an operation that writes a file when creating a struct. When the variable goes out of scope, we may then want to delete the file that was written while deallocating the variable from memory.
+ This would be an instance where we want to take the struct and implement the "drop" trait in a custom manner
+ */
+
+/*
+ * The Copy Trait
+ */
+
+use std::fmt::{Debug, Display, Formatter, Result};
+use std::fs; // filesystem module
+use std::ops::Drop; // May be in the prelude but we'll do this anyway
+
 
 enum AppleType {
     RedDelicious,
@@ -81,7 +96,13 @@ impl Display for Apple {
 
 impl Debug for Apple {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "Apple Kind: {:#?}\nApple Price: ${:.2}", self.kind, self.price) // NOTE: We have to use the debug style formatting, otherwise we'll get the display style formatting and not our debug version!
+        return f.debug_struct("** Apple ** ").field("Kind", &self.kind).field("Price", &self.price).finish(); // The formatter methods. This is the builder design pattern.
+    }
+}
+
+impl Drop for Apple {
+    fn drop(&mut self) {
+        println!("Apple is being cleaned up");
     }
 }
 
@@ -178,4 +199,10 @@ fn main() {
 
 
     println!("Formatter Methods");
+
+    println!("Implementing the Drop Trait"); // NOTE: We can see that because we implemented a println as part of the drop statement that at the end of the program when the apple struct we created goes out of scope
+
+
+    println!("The Copy Trait");
+
 }
