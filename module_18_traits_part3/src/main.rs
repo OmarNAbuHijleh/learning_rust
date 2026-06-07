@@ -65,11 +65,46 @@
 
 /*
  * Implementing the PartialEq trait for Structs
+ This trait establishes equality between two values. It let's us apply operators like the "==" and "!="
+ By default the trait assumes the values being compared are the same type, but it's actually more flexible than that. It' also included in the Rust prelude
+ There's also the "eq" method, which does the same thing as the "==" operator. Implementing "eq" automatically establishes the functionality of "ne" (not equal)
+
+ Just like with other traits, we can use the "derive" attribute. If we do, it'll then check all of the fields and if they are the same value!
+ */
+
+/*
+ * Defining Equality for Different Types
  */
 
 use std::fmt::{Debug, Display, Formatter, Result};
 use std::ops::Drop; // May be in the prelude but we'll do this anyway
-use std::clone::{self, Clone}; // This is in the rust prelude but we're including it anyway
+use std::clone::Clone; // This is in the rust prelude but we're including it anyway
+
+// #[derive(PartialEq)]
+struct Flight {
+    origin: String,
+    destination: String,
+    time: String
+}
+
+impl Flight {
+    fn new(origin: &str, destination: &str, time: &str) -> Self {
+        Self {
+            origin: origin.to_string(),
+            destination: destination.to_string(),
+            time: time.to_string()
+        }
+    }
+}
+
+impl PartialEq for Flight {
+    fn eq(&self, other: &Self) -> bool {
+        // We're going to define a flight with the same origin and destination as being equal (so ignoring the time)
+        self.origin == other.origin && self.destination == other.destination
+    }
+}
+
+
 
 # [derive(Debug, Clone)] // Here, "Duration" is implementing the "Clone" supertrait
 struct Duration {
@@ -283,4 +318,13 @@ fn main() {
     println!("{:?}", one_hour);
 
     println!("Implementing the PartialEq trait for Structs");
+    let flight1 = Flight::new("New York", "London", "10:00 AM");
+    let flight2 = Flight::new("New York", "London", "10:00 PM");
+    let flight3 = Flight::new("New York", "Los Angeles", "10:00 PM");
+    // The above 2 flights should be equal because they have the same origin and destination, as we've defined
+    println!("Equal flights --> {}", flight1==flight2);
+    println!("Equal flights --> {}", flight1==flight3);
+    println!("Equal flights --> {}", flight1.eq(&flight3)); // We can also use the "eq" method directly as shown
+    println!("Equal flights --> {}", flight1!=flight3); // We can also use the "ne" method directly as shown
+    println!("Equal flights --> {}", flight1.ne(&flight3)); // We can also use the "ne" method directly as shown
 }
