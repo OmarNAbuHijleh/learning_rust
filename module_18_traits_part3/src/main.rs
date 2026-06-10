@@ -74,11 +74,139 @@
 
 /*
  * Defining Equality for Different Types
+ We can define equality between two different types
  */
+
+/*
+ * Implementing the PartialEq Trait for Enums
+ *
+ * Two enum results are equal when implementing the PartialEq trait when they have the same enum value and associated data value!
+ */
+
+/*
+ * Implementing the Eq Trait
+ * there's an additional trait called the "eq" trait
+ * The eq trait is a subtrait of the PartialEq super trait
+ * The eq trait doesn't require any methods. It declares that three additional principles will apply:
+ * 1.) reflexive: a == a;
+ * 2.) symmetric: a == b implies b == a (required by PartialEq as well);
+ * 3.) transitive: a == b and b == c implies a == c (required by PartialEq as well)
+ *
+ * the reason the rust team declared 2 separate traits is because there are exceptions a type will implement only the partialEq. For example f32 and f64.
+ * NaN is techincally a float of type f64, for example. And an NaN cannot equal an NaN
+ */
+
+/*
+ * Implementing the PartialOrd trait
+ We can impliement this trait to indicate that a type can be ordered/sorted
+ It's included in the rust prelude. We can also use it to define logic for different types, not just same type scenarios
+ This is a sub trait of the PartialEq supertrait --> If a type chooses to implement PartialOrd it must also implement PartialEq
+ */
+
+/*
+ * Associated Types
+ This is a placeholder is like a generic in spirit in the sense that it's a placeholder for a future concrete type but it's coupled to a trait definition
+
+ Whenever we use a trait with an associated type, we need to provide a concrete type for that associated type
+ */
+
 
 use std::fmt::{Debug, Display, Formatter, Result};
 use std::ops::Drop; // May be in the prelude but we'll do this anyway
 use std::clone::Clone; // This is in the rust prelude but we're including it anyway
+use std::cmp::Ordering; // cmp is the "compare" module
+use std::ops::Add; // ops is the "operations" library
+
+fn add_two_numbers<T: Add<Output = T>>(a: T, b: T) -> T {
+    // This function is operating on a Generic that implements the Add trait, where the Add trait returns the generic type T as it's associated output type
+    return a+b;  // This will not compile because the compiler cannot guarantee that a and b are types that can be added together, unless we add a trait constraint for the generic to implement the Add trait! On it's own, the Add trait is insufficient though, because the definition of the trait indicates that it returns a Self::Output type - and so it needs to know what the return type will be!
+}
+#[derive(Debug)]
+struct Lunch {
+    cost: f64,
+}
+
+impl Add for Lunch {
+    type Output = f64; //Our associated type
+    // An alternative implementation if we try to change the output to be a lunch struct with the new total cost instead
+    // type Output = Lunch;
+    // fn add(self, rhs: Self) -> Self {
+    //     Self {
+    //         cost: self.cost + rhs.cost
+    //     }
+    // }
+    fn add(self, rhs: Self) -> Self::Output { // Doing things this ways sets the Add implementation to return a f64 if we add two lunch structs together
+        self.cost + rhs.cost
+    }
+}
+
+
+struct Job {
+    salary: u32,
+    commute_time: u32,
+}
+
+impl PartialEq for Job {
+    fn eq(&self, other: &Self) -> bool {
+        self.salary == other.salary
+    }
+}
+
+impl Eq for Job {}
+
+impl PartialOrd for Job {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        // Instead of the below code, we could just do self.salary.partial_cmp(&other.salary) because u32 data types implement the PartialCmp trait!
+        if self.salary == other.salary {
+            Some(Ordering::Equal)
+        } else if self.salary < other.salary {
+            Some(Ordering::Less)
+        } else if self.salary > other.salary {
+            Some(Ordering::Greater)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(PartialEq)]
+enum Musician {
+    SingerSongWriter(String),
+    Band(u32),
+}
+use Musician::{Band, SingerSongWriter}; // This is just so we can reference the enum values directly instead of using the Musician prefix
+
+// impl PartialEq for Musician {
+//     fn eq(&self, other: &Self) -> bool {
+//         match self {
+//             SingerSongWriter(name) => match other {
+//                 SingerSongWriter(other_name) => name == other_name,
+//                 Band(_) => false
+//             },
+//             Band(members) => match other {
+//                 SingerSongWriter(_) => false,
+//                 Band(other_members) => members == other_members,
+//             },
+//         }
+//     }
+// }
+
+
+struct BusTrip {
+    origin: String,
+    destination: String,
+    time: String
+}
+
+impl BusTrip{
+    fn new(origin: &str, destination: &str, time: &str) -> Self {
+        Self {
+            origin: origin.to_string(),
+            destination: destination.to_string(),
+            time: time.to_string()
+        }
+    }
+}
 
 // #[derive(PartialEq)]
 struct Flight {
@@ -104,6 +232,12 @@ impl PartialEq for Flight {
     }
 }
 
+impl PartialEq<BusTrip> for Flight { // This is the definition of partial eq between a flight and a bus trip!
+        fn eq(&self, other: &BusTrip) -> bool {
+        // We're going to define a flight with the same origin and destination as being equal (so ignoring the time)
+        self.origin == other.origin && self.destination == other.destination
+    }
+}
 
 
 # [derive(Debug, Clone)] // Here, "Duration" is implementing the "Clone" supertrait
@@ -327,4 +461,41 @@ fn main() {
     println!("Equal flights --> {}", flight1.eq(&flight3)); // We can also use the "eq" method directly as shown
     println!("Equal flights --> {}", flight1!=flight3); // We can also use the "ne" method directly as shown
     println!("Equal flights --> {}", flight1.ne(&flight3)); // We can also use the "ne" method directly as shown
+
+    println!("Defining Equality for Different Types");
+    let bus_trip = BusTrip::new("New York", "London", "10:30 AM");
+    println!("Flight and Bus Trip are equal? --> {}", flight1.eq(&bus_trip)); // We can do this because we defined the equality for flights and bus trips by having the same origin and destination!
+    // NOTE: we can't do bus_trip.eq(&flight1) because we never defined it as a BusTrip function implementation of the trait
+
+    println!("Implementing the PartialEq Trait for Enums");
+    let rustin_beiber = SingerSongWriter("Rustin".to_string());
+    let rustin_timberlake = SingerSongWriter("Rustin".to_string());
+    let holly = SingerSongWriter("Holly".to_string());
+
+    let backstreet_boys = Band(32);
+    let jane_street = Band(32);
+    let one_direction = Band(5);
+
+    println!("Rustin Bieber and Holly --> {}", rustin_beiber.eq(&holly));
+    println!("Rustin Beiber and Rustin Timberlake --> {}", rustin_beiber.eq(&rustin_timberlake));
+    println!("Backstreet Boys and Jane Street --> {}", backstreet_boys.eq(&jane_street));
+    println!("One Direction and Backstreet Boys --> {}", one_direction.eq(&backstreet_boys));
+
+    println!("Implementing the PartialOrd Trait");
+    let long_commute_job = Job{salary: 100000, commute_time: 2};
+    let short_commute_job = Job{salary: 75000, commute_time: 2};
+
+    println!("{}", long_commute_job > short_commute_job);
+    println!("{}", long_commute_job == short_commute_job);
+    println!("{}", long_commute_job < short_commute_job); // You can also use methods --> lt, le, gt, ge
+
+    println!("Associated Types");
+    let lunch1 = Lunch{cost: 10.0};
+    let lunch2 = Lunch{cost: 5.0};
+    println!("{}", lunch1 + lunch2); // this now works for our custom type
+
+    println!("{}", add_two_numbers(1.5, 2.4));
+    println!("{}", add_two_numbers(1, 2));
+
+
 }
