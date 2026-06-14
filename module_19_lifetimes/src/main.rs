@@ -31,7 +31,56 @@
 
 /*
  * Functions Cannot Return References to Owned Values or Parameters
+ * A function cannot return a reference to a value created inside of its body or return a reference to an owned parameter because either of those situations would create a dangling reference
 */
+
+/*
+ * References as Function Parameters
+ * The lifetime of the referent being passed into a function must last until the function call if we want to return a reference to that data from a function. See "select_first_two_elements_3" for more.
+ */
+
+/*
+ * Intro to Generic Lifetimes
+ */
+
+// This function has no issues
+fn create() -> i32 {
+    let age = 100;
+    return age;
+}
+
+// // This function doesn't work because the created variable's reference lasts longer than the lifetime of the refered variable. This issue applies to a function parameter as well
+// fn create2() -> &i32 {
+//     let age = 100;
+//     return &age;
+// }
+
+// fn create_slice(items: Vec<i32>) -> &[i32] {
+//     &items // notice how this return doesn't work
+// }
+
+// // Whenever we invoke this function, because i32 implements the copy trait Rust will copy the value we pass in for the function invocation, and the lifetime of that copy will end - leading to a dangling reference
+// // We can, however, return the actual value
+// fn create_number_reference(number: i32) -> &i32 {
+//     return &number;
+// }
+
+fn select_first_two_elements(items: &Vec<String>) {
+    let selected_items = &items[..2];
+    println!("{:?}", selected_items);
+}
+
+// Changing the function to take a reference to a collection of Strings -> This makes it so we can pass in a more dynamic collection (A reference to a vector of strings or a reference to an array of strings)
+// Either will work because rust will use deref coersion to coerce either type to a some slice of a collection of strings
+fn select_first_two_elements_2(items: &[String]) {
+    let selected_items = &items[..2];
+    println!("{:?}", selected_items);
+}
+
+// NOTE: This will work. Why? Because the lifetime of the variable being passed in to the function extends beyond this function call. Therefore, a pointer to that original variable will still be acceptable as a return (i.e. we're won't have a dangling pointer)
+fn select_first_two_elements_3(items: &[String]) -> &[String] {
+    &items[..2]
+}
 
 fn main() {
     println!("Concrete Lifetimes for values");
@@ -79,4 +128,22 @@ fn main() {
 
 
     println!("Functions Cannot Return References to Owned Values or Parameters");
+
+    println!("References as Function Parameters");
+    let cities = vec![String::from("Chicago"), String::from("Los Angeles"), String::from("New York")];
+    select_first_two_elements(&cities);
+
+    let coffees = [
+        String::from("Latte"),
+        String::from("Mocha"),
+        String::from("Hot Chocolate"),
+    ];
+
+    select_first_two_elements_2(&cities);
+    select_first_two_elements_2(&coffees);
+
+    let output = select_first_two_elements_3(&coffees);
+    println!("{:?}", output);
+
+    println!("Intro to Generic Lifetimes");
 }
