@@ -57,6 +57,24 @@
 
 /*
  * Lifetimes and Referents
+ * To reiterate from the last lesson, the lifetime syntax doesn't create a coupling between the input reference and the return reference. It creates a coupling between the return reference and the referent (the original data source)
+ */
+
+/*
+ * Lifetime Elision Rules Part 1
+ *
+ * Elision: The act of omitting something or leaving it out
+ *
+ * This refers to omitting generic lifetime annotations in situations where the borrow checker can infer the lifetime relationships automatically.
+ *
+ * There are 3 rules:
+ * 1.) The compiler assigns a lifetime to each parameter that is a REFERENCE
+ * 2.) If there is one reference parameter and the return value is a reference, the borrow checker will infer that their lifetimes are related
+ *
+ */
+
+/*
+ * Multiple Parameters Part 1
  */
 
 // This function has no issues
@@ -181,4 +199,18 @@ fn main() {
 
 
     println!("Lifetimes and Referents");
+    let cities = vec![
+        String::from("London"),
+        String::from("New York"),
+        String::from("Barcelona")
+    ];
+    let sliced_result = {
+        let cities_reference = &cities;
+        select_first_two_elements_4(cities_reference) // The lifetime of the return value is coupled to the lifetime of the referent that was passed in (i.e. the original "cities" variable)
+    };
+    println!("{sliced_result:?}");
+
+    println!("Lifetime Elision Rules Part 1");
+    println!("Multiple Paremeters Part 1");
+
 }
