@@ -41,6 +41,22 @@
 
 /*
  * Intro to Generic Lifetimes
+ * When we say generic, we mean non-specific. When we use "concrete" - we mean actual or non-realized. A generic is a placeholder for a future type. Generics add flexibility by not hardcoding an exact type.
+ * Code can use a variety of types in the place of a generic.
+ *
+ * There are generic lifetimes and concrete lifetimes:
+ * A concrete lifetime is an area of the code that a value exists in a program (the time it lives in its memory address)
+ * A generic lifetime is more abstract. It is a hypothetical lifetime, a non-specific lifetime, a future lifetime that can vary.
+ * We can annotate generic lifetimes in our code. This enables functions that are flexible enough to handle varying lifetimes
+ *
+ * Lifetime Annotations:
+ * A lifetime annotation is a name or a label for a lifetime
+ * Lifetime annotations don't change the reference's lifetime. They don't affect the logic in any way
+ * A lifetime annotation is a piece of metadata that we provide to the borrow checker so that it can validate that references are valid.
+ */
+
+/*
+ * Lifetimes and Referents
  */
 
 // This function has no issues
@@ -79,6 +95,14 @@ fn select_first_two_elements_2(items: &[String]) {
 
 // NOTE: This will work. Why? Because the lifetime of the variable being passed in to the function extends beyond this function call. Therefore, a pointer to that original variable will still be acceptable as a return (i.e. we're won't have a dangling pointer)
 fn select_first_two_elements_3(items: &[String]) -> &[String] {
+    &items[..2]
+}
+
+// NOTE: Generic lifetimes example. The " ' " (also known as a "tick" symbol) informs the compiler that we're providing an annotation (a generic lifetime). The letter "a" is arbitrary and it's really up to the developer what they decide to provide
+// You can have multiple lifetime annotations. So you might have <'a, 'b> for instance. " 'a " is the full lifetime name. We can't just use "a" by itself when referencing the liftime.
+// What this is saying: For some generic, hypothetical lifetime 'a, the returned reference must live within the lifetime of the referent that "items" is a reference to because we've also marked "items" with 'a.
+// "Whatever the original source of the argument is, the return value must live within it's lifetime"
+fn select_first_two_elements_4<'a>(items: &'a [String]) -> &'a [String] {
     &items[..2]
 }
 
@@ -146,4 +170,15 @@ fn main() {
     println!("{:?}", output);
 
     println!("Intro to Generic Lifetimes");
+    let cities = vec![
+        String::from("London"),
+        String::from("New York"),
+        String::from("Barcelona")
+    ];
+    let sliced_result = select_first_two_elements_4(&cities);
+    // drop(cities); // We're not permitted to do this because sliced_result must live within the lifetime of "cities"
+    println!("{:?}", sliced_result);
+
+
+    println!("Lifetimes and Referents");
 }
