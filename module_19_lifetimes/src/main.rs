@@ -74,8 +74,47 @@
  */
 
 /*
- * Multiple Parameters Part 1
+ * Multiple Parameters
+ * The borrow checker needs lifetime annotations when our function passes in more than 1 reference parameter.
  */
+
+/*
+ * Lifetime Elision Rules Part 2
+ */
+
+
+// fn choose_favorite(first: &str, second: &str) -> &str { // This will give an error without the lifetime annotation because it doesn't know if the lifetime of this returned reference is tied to "first" or "second"
+//     first
+// }
+
+// Scenario 1: Both input reference parameters are related to the returned reference
+fn choose_favorite<'a>(first: &'a str, second: &'a str) -> &'a str {
+    let some_bool = true;
+    if some_bool {
+        first
+    } else {
+        second
+    }
+}
+
+// Scenario 2: Only 1 of the input reference parameters is related to the returned reference - this is an issue with not establishing the lifetime contract. Adding it will make it work
+fn choose_favorite_2<'a>(first: &'a str, second: &str) -> &'a str {
+    println!("{second:?}");
+    return first;
+}
+
+fn longest<'a>(first: &'a str, second: &'a str) -> &'a str {
+    if first.len() > second.len() {
+        first
+    } else {
+        second
+    }
+}
+
+fn longest_2<'a, 'b>(first: &'a str, second: &'b str) -> &'a str { // This says that only the first parameter is a valid reference that can be returned
+    println!("The second is {second}");
+    first
+}
 
 // This function has no issues
 fn create() -> i32 {
@@ -211,6 +250,37 @@ fn main() {
     println!("{sliced_result:?}");
 
     println!("Lifetime Elision Rules Part 1");
-    println!("Multiple Paremeters Part 1");
+
+    println!("Multiple Paremeters");
+    let orlando = String::from("Orlando");
+    let sf = String::from("San Francisco");
+    let result = longest(&orlando, &sf); // The lifetime passed into this function is the shorter of the two input references (or the overlapping lifetime of the two)
+    println!("{result}");
+
+
+    // Different input lifetime example
+    let orlando = String::from("Orlando");
+    {
+        let sf = String::from("San Francisco");
+        let result = longest(&orlando, &sf); // The lifetime of result will be the overlap of existence where orlando and sf share a lifetime - in this case, that's the lifetime of san francisco's lifetime, as it's the shorter of the two
+        println!("{result}"); // If we try to use the "result" variable outside of this scope, we'll get an error, since we would be outside the lifetime of the "sf" variable
+    }
+    println!("{orlando}");
+
+    // Another example: This doesn't work because we would potentially be returning a dangling reference to the "sf" variable
+    let orlando = String::from("Orlando");
+    // let result = {
+    //     let sf = String::from("San Francisco");
+    //     longest(&orlando, &sf)
+    // }
+
+    // The version that will work!
+    let orlando = String::from("Orlando");
+    let result = {
+        let sf = String::from("San Francisco");
+        longest_2(&orlando, &sf) // We've adjusted this function to only allow the first reference to be returned
+    };
+
+    println!("Lifetime Elision Rules Part 2");
 
 }
