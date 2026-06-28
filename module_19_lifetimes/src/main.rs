@@ -80,7 +80,44 @@
 
 /*
  * Lifetime Elision Rules Part 2
+ * In a method definition, if there are multiple reference parameters but one of them is "self", the borrow checker will assume the lifetime of the instance is connected to the lifetime of the return value
  */
+
+/*
+ * Lifetimes in Structs
+ * So far, all of the structs we've defined have only held types that either implement the copy trait or a type that is an owned type like a string
+ *
+ * What happens when your struct stores references?
+ */
+
+ /*
+  * Multiple Lifetimes
+  */
+
+ // struct TrainSystem {
+ //     name: &str, // This will not work because we need generic lifetime annotations
+ // }
+
+
+ #[derive(Debug)]
+ struct TrainSystem<'a> {
+     name: &'a str, // Here, we're telling the comipiler that the struct's lifetime must not extend beyond the name field. Otherwise, the name field would be a dangling reference!
+ }
+
+ struct DentistAppointment {
+     doctor: String
+ }
+
+ impl DentistAppointment {
+     fn book(&self, check_in_time: &str, check_out_time: &str) -> &str { // Because one of the reference parameters is "self", the return value is assumed to share the lifetime of the "self"
+         println!("You are booked from {} to {} with doctor {}", check_in_time, check_out_time, self.doctor);
+         &self.doctor
+     }
+     fn book_2<'a, 'b, 'c>(&'a self, check_in_time: &'b str, check_out_time: &'c str) -> &'b str { // We can specify the lifetime if it's not supposed to share the lifetime of self
+         println!("You are booked from {} to {} with doctor {}", check_in_time, check_out_time, self.doctor);
+         check_in_time
+     }
+ }
 
 
 // fn choose_favorite(first: &str, second: &str) -> &str { // This will give an error without the lifetime annotation because it doesn't know if the lifetime of this returned reference is tied to "first" or "second"
@@ -282,5 +319,27 @@ fn main() {
     };
 
     println!("Lifetime Elision Rules Part 2");
+    let apptmt = DentistAppointment{doctor: String::from("Saqib Mohajer")};
+    let result = apptmt.book("8:30 AM", "9:30 AM");
+    println!("{result}");
+    let result2 = apptmt.book_2("10:00 AM", "2:00 PM");
+    println!("{result2}");
+
+    println!("Lifetimes in Structs");
+    let name = String::from("NJ Transit");
+    let nj_transit = TrainSystem {
+        name: &name
+    };
+    println!("{nj_transit:#?}");
+
+    // The below example does not work because the data we're referencing because a dangling pointer when out of scope
+    // let nj_transit = {
+    //     let name = String::from("NJ Transit");
+    //     TrainSystem {name: &name}
+    // };
+    // println!("{nj_transit:#?}");
+
+
+    println!("Multiple Lifetimes");
 
 }
