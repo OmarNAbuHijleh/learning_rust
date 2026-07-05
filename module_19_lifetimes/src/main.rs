@@ -90,9 +90,40 @@
  * What happens when your struct stores references?
  */
 
- /*
-  * Multiple Lifetimes
-  */
+/*
+ * Multiple Lifetimes
+ * When we declare a struct, we can define multiple lifetimes that enable references to be connected to different periods of existence
+ */
+
+/*
+ * The Static Lifetime
+ * The borrow checker understands " 'static " as a special lifetime that acts as an exception to the rules. It enables us to return a reference to data that is declared in a function. It is a reference that will exist for the duration of the program.
+ *
+ * Constants are another example
+ */
+
+const COUNT: i32 = 400;
+
+// The static lifetime example
+fn say_hello() -> &'static str {
+    "Hello"
+}
+
+fn value() -> &'static i32 {
+    &COUNT
+}
+
+# [derive(Debug)]
+struct TravelPlan<'a> {
+    from: &'a str,
+    to: &'a str,
+}
+
+# [derive(Debug)]
+struct TravelPlan2<'a, 'b> {
+    from: &'a str,
+    to: &'b str,
+}
 
  // struct TrainSystem {
  //     name: &str, // This will not work because we need generic lifetime annotations
@@ -341,5 +372,31 @@ fn main() {
 
 
     println!("Multiple Lifetimes");
+    // // If we do this, the borrow checker limits us to the lifetime of the "to" field, because it expects the "from" and "to" fields to have the same lifetime, so the code will not work
+    // let from = String::from("Portland");
+    // let plan = {
+    //     let to = String::from("Bangor");
+    //     let travel_plan = TravelPlan {
+    //         from: &from,
+    //         to: &to,
+    //     };
 
+    //     travel_plan.from
+    // };
+
+    // If we do this, the borrow checker understands that the "from" and "to" fields understands we do not require the same lifetime based on our definition of the "TravelPlan2" struct. This means we can return the reference to "from" without an issue
+    let from = String::from("Portland");
+    let plan = {
+        let to = String::from("Bangor");
+        let travel_plan = TravelPlan2 {
+            from: &from,
+            to: &to,
+        };
+
+        travel_plan.from
+    };
+    println!("{plan:?}");
+
+
+    println!("The Static Lifetime");
 }
