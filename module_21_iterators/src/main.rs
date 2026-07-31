@@ -48,10 +48,32 @@
 
 /*
  * String Iteration
+ * A string character we see is not always equivalent to an individual byte in memory. An english alphabetic character occupies a byte but an emoji might occupy 2 or 4 bytes. Since for strings, we can either iterate over the characters or the bytes in the string.
+ *
+ * Due to the ambiguity, we can't use the "iter" method or the "iter_mut" method. Instead, we can use the "chars" or the "bytes" method
  */
+
+/*
+ * Solving a Problem with Iteration"
+ */
+
+/*
+ * The for_each Method
+ */
+
 use std::collections::HashMap;
 
- fn main() {
+fn count_words(text: &str) -> HashMap<&str, u32> {
+    // split the spaces
+    let words = text.split_whitespace();
+    let mut ret_hashmap = HashMap::new();
+    for word in words {
+        ret_hashmap.entry(word).and_modify(|input_word| {*input_word += 1}).or_insert(1_u32);
+    }
+    return ret_hashmap;
+}
+
+fn main() {
     println!("Manual Iteration");
     let numbers = vec![4, 8, 15, 16, 23, 42];
     // 1.) The loop keyword - continually executes a block until we force termination with the "break" keyword
@@ -185,4 +207,25 @@ use std::collections::HashMap;
     println!("{todos:?}"); // will work because ownership did not move. Values successfully changed
 
     println!("String Iteration");
+    let seafood = "Oyster🦪"; // This emoji occupies 4 bytes in memory
+    for byte in seafood.bytes() {
+        print!("{byte}/");
+    }
+    println!("{seafood}"); // This will not lose ownership
+
+    for character in seafood.chars() {
+        print!("{character}/");
+    }
+    println!("{seafood}"); // This will not lose ownership
+
+    println!("{}", seafood.bytes().len()); // 10 bytes. These functions exhaust the iterator themselves
+    println!("{}", seafood.chars().count()); // 7 chars. These functions exhaust the iterator themselves
+
+
+    println!("Solving a Problem with Iteration");
+    let some_text = "Some text to try testing the iteration test method we made where test shows up twice";
+    println!("{:?}", count_words(some_text));
+
+    println!("The for_each Method");
+
 }
