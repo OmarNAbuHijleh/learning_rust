@@ -59,6 +59,31 @@
 
 /*
  * The for_each Method
+ * Instead of a for loop, we can invoke the "for_each" method on an iterator and pass in a closure to that method. It will operate on each element of the iterator
+ */
+
+/*
+ * The map Method
+ * Once we have an iterator, we can invoke methods on it to transform it into another iterator.
+ * An "adapter" method is one that transforms an iterator into another iterator based on some logic
+ * The methods consume the iterator. The contents however, are not consumed until the original iterator is exhausted
+ *
+ * map is the most popular adapter method. The "map" method applies a closure onto the original iterator to arrive at a new iterator of values
+ *
+ * "map" is lazy --> We may create an iterator with it but until we explicitly execute it the orignal data lives in it's previous owner!
+ *
+ * We can chain the map command multiple times in a chain of sequential transformations
+ */
+
+/*
+ * The collect Method
+ * Say we wanted to take a vector of numbers and use it as the basis of creating a new vector holding the squares.
+ *
+ * The collect method exhausts the iterator and gathers the resulting values in a new collection type, such as a vector. Think of it as going through a for loop and pushing each value into a new vector
+  */
+
+/*
+ * The Filter and Find Methods
  */
 
 use std::collections::HashMap;
@@ -227,5 +252,61 @@ fn main() {
     println!("{:?}", count_words(some_text));
 
     println!("The for_each Method");
+    let mut our_hashmap = HashMap::<&str, i32>::new();
+    some_text.split_whitespace().
+        for_each(|word| {
+                our_hashmap.entry(word).
+                    and_modify(|val| {*val += 1}).
+                    or_insert(1);
+            });
+    println!("{:?}", our_hashmap);
+
+    println!("The map Method");
+    let numbers = vec![4, 8, 15, 16, 23, 42];
+    let my_iterator = numbers.iter();
+    let squares = my_iterator.map(|element: &i32| {
+        element.pow(2)
+    });
+    // println!("{my_iterator:?}"); // NOTE: Doesn't work because my_iterator lost ownership
+    println!("{squares:?}"); // NOTE: These still only show the original values from the "my_iterator". This is because we haven't executed the "squares" mapping yet - just set it up. We still need to iterate over it for the original values to change. map is a lazy method
+    println!("{numbers:?}"); // NOTE: This still works because we borrowed references towards the original values --> the "iter" method
+
+    for number in squares {
+        println!("Square: {number:?}"); // NOTE: This will implement the squaring of the values. squares also loses it's values following this
+    }
+
+    println!("The collect Method");
+    let numbers = vec![4, 8, 15, 16, 23, 42];
+    let squares: Vec<i32> = numbers.iter().map(|number: &i32| {number.pow(2)}).collect();
+    // let squares: Vec<_> = numbers.iter().map(|number: &i32| {number.pow(2)}).collect(); // Here the "_" tells the compiler to try and figure out the type of data type the vector will contain. You can also use the turbofish operator with the collect method to establish what the data type will be
+    println!("{squares:?}");
+    println!("{numbers:?}");
+
+
+    println!("The map method continued");
+    let names = [
+        String::from("Jimmy"),
+        String::from("Cleveland"),
+        String::from("Boris"),
+    ];
+    // We're going to lowercase each string, replace each "i" character with 2 "@" signs, then take the length of each resulting string and return all of those lengths in a new vector
+
+    let collection_results: Vec<i32> = names.iter().map(
+        |input_str| {
+            input_str.to_lowercase()
+        }
+    ).map(
+        |input_str| {
+            input_str.replace("i", "@@")
+        }
+    ).map(
+        |input_str| {
+            input_str.chars().count() as i32
+        }
+    ).collect();
+
+    println!("{collection_results:?}");
+
+    println!("The Filter and Find Methods");
 
 }
