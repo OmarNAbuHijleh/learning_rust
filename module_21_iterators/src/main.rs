@@ -84,6 +84,32 @@
 
 /*
  * The Filter and Find Methods
+ * The filter method extracts a subset of values that satisfy a condition. Pass a closure that returns true for the elements to keep and false for the elements to exclude. It's similar to the "retain" method on strings
+ */
+
+/*
+ * The any and all Methods
+ * Sometimes we don't care about extracting every element that satisfies a condition, or the first element. Sometimes we just want to validate if all or one of the elements satisfy a condition (a boolean). Not the data itself
+ *
+ * We can still do that with the filter and find methods but we could also just make our lives easier by using the "any" and "all" methods
+ *
+ * A "predicate" in rust is a closure that returns a boolean. You'll sometimes see this in documentation
+ */
+
+/*
+ * The cloned Method
+ * Before, we introduced the "copied" method, which converts an iterator of references to a type to an iterator of the type itself. The caveat is that the type must implement the Copy trait.
+ *
+ * The cloned method similarly converts an iterator of references to a type into an iterator of the type itself. The type must implement the Clone trait. This is usually going to be heap based data.
+ */
+
+/*
+ * The filter_map Method
+ * This allows us to filter and transform a subset of elements from an iterator
+ */
+
+/*
+ * The flatten Method
  */
 
 use std::collections::HashMap;
@@ -96,6 +122,19 @@ fn count_words(text: &str) -> HashMap<&str, u32> {
         ret_hashmap.entry(word).and_modify(|input_word| {*input_word += 1}).or_insert(1_u32);
     }
     return ret_hashmap;
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum ChannelType {
+    Comedy,
+    News,
+    ProgrammingTutorials,
+}
+
+#[derive(Debug)]
+struct TVChannel {
+    name: String,
+    channel_type: ChannelType
 }
 
 fn main() {
@@ -308,5 +347,123 @@ fn main() {
     println!("{collection_results:?}");
 
     println!("The Filter and Find Methods");
+    let numbers = [100, 13, 23, 2, 8, 9, 6];
+    // NOTE: The filter method takes in a reference to the values instead of copying them
+    // NOTE: We need the "collect" method to actually perform the filtering. The "filter" method is lazy!
+    // NOTE: Here, we're not using "*input_val" in the closure because the data type is one that Rust automatically de-references for us
+    let evens: Vec<i32> = numbers.into_iter().filter(|input_val| {return (input_val % 2) == 0}).collect();
+    println!("{evens:?}");
+
+    // NOTE: Here, we use the "copied" command. This is useful when we have an iterator over a reference to some type instead of the actual value itself.
+    let evens: Vec<i32> = numbers.iter().filter(|input_val| {return (*input_val % 2) == 0}).copied().collect();
+    println!("{evens:?}");
+
+    // NOTE: The "find" method will return the first element for which the closure is true
+    let numbers = [100, 13, 23, 2, 8, 9, 6];
+    let first_even = numbers.into_iter().find(|input_val| {return (input_val % 2) == 0}).unwrap();
+    println!("{first_even}");
+
+    let nothing = numbers.into_iter().find(|input_val| {return (*input_val > 100) }).unwrap_or(-1);
+    println!("{nothing}");
+    // NOTE: This is the "rfind" - searches for the first value from the end
+    let last_even = numbers.into_iter().rfind(|input_val| {return (input_val % 2) == 0}).unwrap();
+    println!("{last_even}");
+
+    // Now we're going to apply these concepts to other data types, like structs!
+    let channels = [
+        TVChannel{name: String::from("CBS"), channel_type: ChannelType::Comedy},
+        TVChannel{name: String::from("RustLive"), channel_type: ChannelType::ProgrammingTutorials},
+        TVChannel{name: String::from("NBC"), channel_type: ChannelType::News},
+        TVChannel{name: String::from("RustTV"), channel_type: ChannelType::ProgrammingTutorials},
+    ];
+
+    let good_channels: Vec<&TVChannel> = channels.iter().filter(|channel| {return channel.channel_type == ChannelType::ProgrammingTutorials}).collect();
+    println!("{good_channels:?}");
+
+    let good_channels: Vec<String> = channels.iter().filter(|channel| {return channel.channel_type == ChannelType::ProgrammingTutorials}).map(|channel| {return channel.name.clone()}).collect();
+    println!("{good_channels:?}");
+
+    let good_channel = channels.iter().find(|channel|{return channel.channel_type == ChannelType::ProgrammingTutorials}).unwrap();
+    println!("{}", good_channel.name);
+
+    let good_channels = channels.into_iter().filter(|channel| {return channel.channel_type == ChannelType::ProgrammingTutorials});
+    println!("{good_channels:?}");
+
+    println!("The any and all Methods");
+    let channels = [
+        TVChannel{name: String::from("CBS"), channel_type: ChannelType::Comedy},
+        TVChannel{name: String::from("RustLive"), channel_type: ChannelType::ProgrammingTutorials},
+        TVChannel{name: String::from("NBC"), channel_type: ChannelType::News},
+        TVChannel{name: String::from("RustTV"), channel_type: ChannelType::ProgrammingTutorials},
+    ];
+    let any_comedy = channels.iter().any(|channel: &TVChannel| {channel.channel_type == ChannelType::Comedy});
+    println!("{any_comedy}");
+    let all_news = channels.iter().all(|channel: &TVChannel|{channel.channel_type == ChannelType::News}); // This will give us a false
+    println!("{all_news}");
+
+    println!("The Cloned Method");
+    let teas = [
+        String::from("Hot Earl Gray"),
+        String::from("Iced Green"),
+        String::from("Hot Matcha")
+    ];
+    let more_teas: Vec<&String> = teas.iter().collect(); // Note how we have to indicate that this will store string references
+    println!("{more_teas:?}");
+
+    println!("References:"); // NOTE: THAT THIS WILL HAVE THE SAME MEMORY ADDRESSES FOR THE STRING DATA AS THE "ORIGINAL TEAS"
+    for tea in &more_teas {
+        println!(
+            "{:?} -> String object: {:p}, string data: {:p}",
+            tea,
+            *tea as *const String,
+            tea.as_ptr()
+        );
+    }
+    // Now, if we decide to use the "cloned" we get the same values as in teas, but they are completely decoupled (i.e. ownership is not passed from "teas" to "more_teas")
+    let more_teas: Vec<String> = teas.iter().cloned().collect();
+    println!("{more_teas:?}");
+    println!("{teas:?}");
+    // Printing out the memory addressing for each of these guys
+    println!("\nOriginal teas:");
+    for tea in &teas {
+        println!(
+            "{:?} -> String object: {:p}, string data: {:p}",
+            tea,
+            tea as *const String,
+            tea.as_ptr()
+        );
+    }
+
+    println!("\nCloned more_teas:"); // NOTE: THIS HAS A DIFFERENT MEMORY ADDRESS FOR THE STRING DATA THAN THE ORIGINAL "TEAS"
+    for tea in &more_teas {
+        println!(
+            "{:?} -> String object: {:p}, string data: {:p}",
+            tea,
+            tea as *const String,
+            tea.as_ptr()
+        );
+    }
+
+    // Pretend we want full copies of the strings that contain the word "Hot" from the original "teas" vector
+    let filtered_teas: Vec<&String> = teas.iter().filter(|input| {input.contains("Hot")}).collect();
+    println!("{filtered_teas:?}");
+    // If we wanted to ensure that we had a Vec<String> instead of a Vec<&String>
+    let filtered_teas: Vec<String> = teas.iter().filter(|input| {input.contains("Hot")}).cloned().collect(); // We could also swap the filter and cloned, but then that's more inefficient because we clone the data we don't want too
+    println!("{filtered_teas:?}");
+
+    println!("The filter_map Method");
+    let stocks = ["nvda", "", "aapl", "", "mst", "goog"];
+    // We want to get the stocks with the actual tickers and capitalize them as well
+    let transformed_and_filtered: Vec<String> = stocks.iter().filter_map(|stock|{
+        if stock.is_empty(){
+            None
+        } else {
+            Some(stock.to_uppercase())
+        }
+    }).collect();
+
+    println!("{transformed_and_filtered:?}");
+
+    println!("The flatten Method");
 
 }
