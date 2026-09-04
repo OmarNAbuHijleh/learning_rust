@@ -110,6 +110,18 @@
 
 /*
  * The flatten Method
+ * This is an adapter that returns an iterator that flattens nested data structures
+ * The result is an iterator with a single value at each index
+ */
+
+/*
+ * The flat_map Method
+ * This combines the idea of a map and a flatten. It transforms the iterator
+ */
+
+/*
+ * The enumerate Method
+ *
  */
 
 use std::collections::HashMap;
@@ -465,5 +477,29 @@ fn main() {
     println!("{transformed_and_filtered:?}");
 
     println!("The flatten Method");
+    let spreadsheet = vec![
+        [100, 200, 300],
+        [123, 456, 789],
+        [987, 654, 321]
+    ];
+    let value: Vec<i32> = spreadsheet.into_iter().flatten().collect();
+    println!("{value:?}");
+
+    println!("The flatten_map Method");
+    let attendees = [
+        "Bob, Mary, Kevin",
+        "Mike, Robby, Matt, Austin",
+        "Piers, Liam"
+    ];
+
+    // let attendees: Vec<&str> = attendees.iter().map(|group| {
+    //     group.split(", ")
+    // }).flatten().collect();
+
+    // the below flat_map call gives us the same result
+    let attendees: Vec<&str> = attendees.iter().flat_map(|group| group.split(", ")).collect();
+    println!("{attendees:?}");
+
+    println!("The enumerate Method");
 
 }
