@@ -121,10 +121,35 @@
 
 /*
  * The enumerate Method
+ * The enumerate adapter transforms an iterator such that the new iterator yields the index position along with the current element. It essentially gives you a tuple of the two
+ */
+
+/*
+ * The partition Method
+ * It's similar to filter in that it accepts a closure with a boolean, but the difference is that it groups and returns the values for which the closure returns true and false
+ */
+
+/*
+ * The zip Method
+ * This combines two iterators together if they have the same index positions. If they are different sizes, then it'll only zip to be the size of the smaller of the two, ignoring the elements that do not have a matching pair
+ */
+
+/*
+ * The fold Method
+ * This method exhausts an iterator to build up an produce a single value at the end of your iteration
+ */
+
+/*
+ * The reduce Method
  *
  */
 
-use std::collections::HashMap;
+use std::{collections::HashMap, iter::zip};
+
+struct SupportStaff {
+    day: String,
+    employee: String
+}
 
 fn count_words(text: &str) -> HashMap<&str, u32> {
     // split the spaces
@@ -501,5 +526,64 @@ fn main() {
     println!("{attendees:?}");
 
     println!("The enumerate Method");
+    // let's make it so that every third person in this vector is the winner
+    let applicants = vec!["Rob", "Bob", "Cob", "Alex", "Piers", "John", "Dan"];
+    let winners: Vec<&str> = applicants.into_iter().enumerate().filter_map(|person_tuple| {
+        if (person_tuple.0+1_usize) % 3 == 0 {
+            Some(person_tuple.1)
+        } else {
+            None
+        }
+    }).collect();
+    println!("{winners:?}");
+
+    println!("The partition Method");
+    let numbers = [4, 8, 15, 16, 23, 42];
+    let grouped:  (Vec<i32>, Vec<i32>) = numbers.into_iter().partition(|number| { number % 2 == 0 });
+    println!("{grouped:?}");
+
+    println!("The zip Method");
+    let first_names = ["Omar", "Mahmoud", "Zaid", "Amir"];
+    let last_names = ["Abu-Hijleh", "Ahmed", "Abuhashish", "Breadman"];
+    let combined = zip(first_names, last_names).map(|tuple_input|{
+        // let mut return_string = String::new();
+        // return_string.push_str(tuple_input.0);
+        // return_string.push_str(" ");
+        // return_string.push_str(tuple_input.1);
+        // return_string
+        let first_name = tuple_input.0;
+        let last_name = tuple_input.1;
+        return format!("{first_name} {last_name}");
+    }).collect::<Vec<String>>();
+    println!("{combined:?}");
+
+    // NOTE: Can also call ".zip" on the first_names variable and pass in the last_names variable as an argument
+
+
+    println!("The fold Method");
+    let numbers = [3, 5, 7, 25, 8, 93, -3];
+    let result_sum = numbers.into_iter().fold(0, |total, input_val| -> i32 {
+        // This is a closure that adds all of the elements together
+        return total + input_val;
+    });
+    println!("The total value is {result_sum}");
+    // NOTE: We could also just use the "sum" method
+    // We can also do something like constructing a hashmap
+
+    let week = [
+        SupportStaff{day: String::from("Monday"), employee: String::from("Brian")},
+        SupportStaff{day: String::from("Tuesday"), employee: String::from("Cam")},
+        SupportStaff{day: String::from("Wednesday"), employee: String::from("Walter")}
+    ];
+
+    let new_hashmap: HashMap<String, String> = week.into_iter().fold(HashMap::new(), |mut hashmap_so_far, support_staff_element|{
+        hashmap_so_far.insert(support_staff_element.day, support_staff_element.employee);
+        hashmap_so_far
+    });
+    println!("{new_hashmap:?}");
+
+
+    println!("The reduce Method");
+
 
 }
