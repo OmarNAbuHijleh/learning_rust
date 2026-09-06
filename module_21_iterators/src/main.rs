@@ -141,7 +141,19 @@
 
 /*
  * The reduce Method
+ * This is similar to the fold method, but it only accepts a closure as a single argument. It supplies the first element as the starter value automatically
  *
+ * This method returns an Option enum to account for the possibility of an empty iterator. The fold method, on the other hand, will return your provided starter value if the iterator is empty
+ */
+
+/*
+ * The sum, product, max, min, and count Methods
+ * Adapter methods produce new iterators from other iterators. We also have functions that exhaust the iterator and produce a single result, like in reduce or fold. We also have the sum, product, max, min, and counts
+ *
+ */
+
+/*
+ * The last, nth, nth_back, and position Methods
  */
 
 use std::{collections::HashMap, iter::zip};
@@ -584,6 +596,40 @@ fn main() {
 
 
     println!("The reduce Method");
+    let earnings = [4, 7, 9, 13];
+    let sum = earnings.into_iter().reduce(|total, input| {total+input}).unwrap_or(0_i32);
+    println!("{sum}");
+
+
+    println!("The sum, product, max, min, and count Methods");
+    let numbers = vec![4, 8, 15, 16, 23, 42];
+    let total: i32 = numbers.iter().sum();
+    println!("{total}");
+    let product: i32 = numbers.iter().product();
+    println!("{product}");
+    let max: i32 = *numbers.iter().max().unwrap_or(&0_i32);
+    println!("{max}");
+    let min: i32 = *numbers.iter().min().unwrap_or(&0_i32);
+    println!("{min}");
+    let count = numbers.iter().count();
+    println!("{count}");
+    // NOTE: Some of these methods do not work on iterators of floating point values, because they can contain NaN. Though the NaN is the result of an invalid mathematical operation, the NaN value itself is of type floating point! That's why floats implement the partial order but not the order trait
+    let invalid = 0.0 / 0.0;
+    let numbers = vec![4.6, 8.8, 0.0/0.0, 6.2, f64::NAN];
+    println!("{numbers:?}");
+    let total: f64 = numbers.iter().sum(); // gives NAN since it's already adding NAN together
+    println!("{total}");
+    // let max = numbers.iter().max().unwrap(); // This doesn't work on floats iterators
+    // THE FIX for total
+    let total: f64 = numbers.iter().filter(|number| !number.is_nan()).sum();
+    println!("{total}");
+    // THE FIX FOR MAX - max works on the individual floats
+    let max_of_numbers = numbers.iter().filter(|number| !number.is_nan()).copied().reduce(|accumulator, current| accumulator.max(current)).unwrap();
+    println!("{max_of_numbers}");
+
+
+    println!("The last, nth, nth_back, and position Methods");
+
 
 
 }
