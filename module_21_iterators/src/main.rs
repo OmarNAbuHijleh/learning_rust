@@ -154,6 +154,16 @@
 
 /*
  * The last, nth, nth_back, and position Methods
+ * Sometimes we want to target an element based on it's position in the iterator
+ */
+
+/*
+ * the take, rev, skip, and step_by Methods
+ * Sometimes we want to exlcude or skip certain elements, or start from a specific index
+ */
+
+/*
+ * The sort and sort_by_key Methods
  */
 
 use std::{collections::HashMap, iter::zip};
@@ -629,6 +639,40 @@ fn main() {
 
 
     println!("The last, nth, nth_back, and position Methods");
+    let performers = ["Rustful Five", "Rust in Peace", "Rustin Beiber"];
+    let last_element = performers.into_iter().last().unwrap(); // Get's the last element of an iterator
+    println!("{last_element}");
+    // nth - gets the nth position element
+    let second_element = performers.into_iter().nth(1).unwrap();
+    println!("{second_element}");
+    let second_to_last = performers.into_iter().nth_back(1).unwrap(); // NOTE: 0 indexing is also used when counting from the back in rust
+    println!("{second_to_last}");
+    // Sometimes we don't want the element, we want the index that contains an element fulfilling some requirement
+    let target_index = performers.into_iter().position(|element|{element=="Rustin Beiber"}).unwrap();
+    println!("{target_index}");
+
+    println!("The take, rev, skip, and step_by Methods");
+    let fifty_numbers = 1..50; // Everything up to 50 (but not including it)
+    // The "take" method let's us limit the scope of the iteration. In this case, the first 15 elements
+    for number in fifty_numbers.take(15) {
+        print!("{number}/");
+    }
+    println!();
+    // The "rev" method reverses the string
+    let fifty_numbers = 1..50; // Everything up to 50 (but not including it)
+    for number in fifty_numbers.rev() {
+        print!("{number}/");
+    }
+    println!();
+    // the "skip" method let's us skip the first n elements
+    let fifty_numbers = 1..50; // Everything up to 50 (but not including it)
+    for number in fifty_numbers.skip(5) {
+        print!("{number}/");
+    }
+
+
+    println!("The sort and sort_by_key Methods");
+
 
 
 
