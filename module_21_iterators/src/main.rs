@@ -164,9 +164,26 @@
 
 /*
  * The sort and sort_by_key Methods
+ * With a vector, we don't need to create an iterator. We have sorting methods
  */
 
-use std::{collections::HashMap, iter::zip};
+/*
+ * The lines Method
+ * The string type supports the lines Method, which returns an iterator of the string's individual lines.
+ */
+
+/*
+ * Collecting Command Line Arguments
+ */
+
+use std::{collections::HashMap, iter::zip, fs, io};
+
+#[derive(Debug)]
+struct GasStation {
+    snack_count: u32,
+    manager: String,
+    employee_count: u32
+}
 
 struct SupportStaff {
     day: String,
@@ -196,7 +213,7 @@ struct TVChannel {
     channel_type: ChannelType
 }
 
-fn main() {
+fn main() -> io::Result<()> {
     println!("Manual Iteration");
     let numbers = vec![4, 8, 15, 16, 23, 42];
     // 1.) The loop keyword - continually executes a block until we force termination with the "break" keyword
@@ -672,8 +689,37 @@ fn main() {
 
 
     println!("The sort and sort_by_key Methods");
+    let mut points = [3, 8, 1, 11, 5];
+    println!("{}", points.is_sorted()); // Gives back a boolean indicating if the vector/array is sorted
+    points.sort(); // sorts the array
+    println!("{}", points.is_sorted()); // Should be sorted now in decending order
+
+    points.reverse();
+    println!("{points:?}");
+    println!("{}", points.is_sorted());
+
+    let mut exercises = ["squat" , "bench", "Deadlift"]; // NOTE: Capital letters come before lowercase letters
+    exercises.sort();
+    println!("{exercises:?}");
+
+    // We can sort using the ord trait or we can just sort by a key
+    let mobile = GasStation{snack_count: 100, manager: String::from("Meg Mobil"), employee_count: 3};
+    let exxon = GasStation{snack_count: 130, manager: String::from("Eric Exxon"), employee_count: 4};
+    let shell = GasStation{snack_count: 50, manager: String::from("Shelly Shell"), employee_count: 2};
+
+    let mut stops = [mobile, exxon, shell];
+    // stops.sort(); // This doesn't work until we implement the ORD trait
+    stops.sort_by_key(|station|{station.snack_count}); // Orders in ascending order based on what our closure returns
+    println!("{stops:?}");
 
 
+    println!("The lines Method");
+    let contents = fs::read_to_string("story.txt")?; // Will return an Error if there's an issue
+    for line in contents.lines() {
+        println!("{line}");
+    }
 
+    println!("Collecting Command Line Arguments");
 
+    Ok(()) // NOTE: Keep this because our main is returning an IO result
 }
