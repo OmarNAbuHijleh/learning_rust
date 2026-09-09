@@ -174,9 +174,22 @@
 
 /*
  * Collecting Command Line Arguments
+ * these are values passed into a program from the terminal when the executable runs.
+ * The rust standard library includes an env sub module for the environment.
  */
 
-use std::{collections::HashMap, iter::zip, fs, io};
+/*
+ * Reading Directory
+ */
+
+use std::{collections::HashMap, iter::zip, fs, io, env, process};
+
+#[derive(Debug)]
+struct Settings {
+    video_name: String,
+    subtitles: bool,
+    high_definition: bool,
+}
 
 #[derive(Debug)]
 struct GasStation {
@@ -720,6 +733,33 @@ fn main() -> io::Result<()> {
     }
 
     println!("Collecting Command Line Arguments");
+    // for arg in args {
+    //     println!("{arg}");
+    // }
+
+    // Video Player Application command line arguments: video file name (string), subtitles (bool), high definition (bool)
+    let settings = collect_settings();
+    println!("{settings:?}");
+
+
+    println!("Reading Directory");
 
     Ok(()) // NOTE: Keep this because our main is returning an IO result
+}
+
+fn collect_settings() -> Settings {
+    let args = env::args(); // The args struct returns an iterator. Note that the first value in the iterator is always the file name
+    // NOTE: We pass in arguments from the command line as follows "cargo run -- <arg1>"
+    // The "--" are to distinguish our command line arguments in our program from command line arguments for cargo
+    let mut relevant_args = args.skip(1).take(3); // skips the first element, since that is just the file name. Then we only want the first 3 elements - any extra command line arguments are just dead
+    let video_file = relevant_args.next().unwrap_or_else(||{
+        eprintln!("No video file specified!");
+        process::exit(1);
+    });
+
+    let mut settings = relevant_args.map(|setting| setting.parse::<bool>().unwrap_or(false));
+    let subtitles = settings.next().unwrap_or(false);
+    let high_definition = settings.next().unwrap_or(false);
+
+    Settings {video_name: video_file, subtitles: subtitles, high_definition: high_definition}
 }
