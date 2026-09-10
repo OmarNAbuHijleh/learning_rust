@@ -180,9 +180,33 @@
 
 /*
  * Reading Directory
+ * We can open a directory in our file system and read the contents as an iterator
  */
 
-use std::{collections::HashMap, iter::zip, fs, io, env, process};
+/*
+ * The FromIterator Trait
+ * An iterator can be converted into another type. It takes in an iterator and returns a collection type
+ */
+
+use std::{collections::HashMap, collections::HashSet, iter::zip, fs, io, env, process};
+
+#[derive(Debug)]
+struct Playlist {
+    songs: Vec<String>,
+    users: HashSet<String>
+}
+
+impl FromIterator<(String, String)> for Playlist {
+    fn from_iter<T: IntoIterator<Item = (String, String)>>(iter: T) -> Self {
+        let mut songs = Vec::new();
+        let mut users = HashSet::new();
+        for (song, user) in iter {
+            songs.push(song);
+            users.insert(user);
+        }
+        Self {songs, users}
+    }
+}
 
 #[derive(Debug)]
 struct Settings {
@@ -743,6 +767,69 @@ fn main() -> io::Result<()> {
 
 
     println!("Reading Directory");
+    let directory = fs::read_dir("./").unwrap_or_else(|error| {
+        eprintln!("could not read directory: {error}");
+        process::exit(1);
+    }); // Reads the current directory
+
+    for entry_result in directory {
+        // Each of these entries will either be a file or folder. This is a Result enum value because of the possibility something may go wrong (a file being deleted after our iterator is made, permissions, etc)
+        match entry_result {
+            Ok(entry) => println!("{:?}", entry.path()),
+            Err(error) => eprintln!("Could not read entry: {error}")
+        }
+    }
+    // Alternatively, we can also do this
+    for entry_result in fs::read_dir("./")? { // Recall that the ? is the try operator. An error would terminate earlier and propogate errors upwards. The Ok variant is just unwrapped
+        // match entry_result {
+        //     Ok(entry) => println!("{:?}", entry.path()),
+        //     Err(error) => {
+        //         eprintln!("Could not read entry: {error}");
+        //     }
+        // }
+
+        // We can also do this
+        if let Ok(entry) = entry_result {
+            // println!("{:?}", entry.path());
+
+            let metadata = fs::metadata(entry.path())?; // Get the file's metadata
+            if metadata.is_file() {
+                println!("{entry:?}\n----------");
+                let contents = fs::read_to_string(entry.path())?;
+                println!("{contents}");
+            }
+        }
+    }
+
+    println!("The FromIterator Trait");
+    let fifty_numbers = 1..=50;
+    let results = Vec::from_iter(fifty_numbers.clone());
+    println!("{results:?}");
+
+    let results = fifty_numbers.clone().collect::<Vec<i32>>();
+    println!("{results:?}");
+    let unique_set: HashSet<_> = HashSet::from_iter(fifty_numbers.clone());
+    println!("{unique_set:?}");
+
+    let unique_set = fifty_numbers.clone().collect::<HashSet<i32>>();
+    println!("{unique_set:?}");
+
+    let chars = ['H', 'e', 'l','l','o'];
+    let greeting = String::from_iter(chars);
+    println!("{greeting}");
+
+    let songs = [
+        (String::from("I rust go on"), String::from("Bob")),
+        (String::from("A rust of wind"), String::from("Bob")),
+        (String::from("A rustworthy man"), String::from("Sheila")),
+    ];
+
+    let playlist: Playlist = Playlist::from_iter(songs.clone()); // Builds a playlist from an iterable of 2 string tuples
+    println!("{playlist:?}");
+
+    let playlist: Playlist = songs.into_iter().collect::<Playlist>();
+    println!("{playlist:?}");
+
 
     Ok(()) // NOTE: Keep this because our main is returning an IO result
 }
