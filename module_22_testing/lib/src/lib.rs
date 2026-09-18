@@ -58,7 +58,16 @@
 
 /*
  * Custom Failure Messages
- *
+ * The final argument to any assertion macro is a custom failure messages. It is optional. Remember, optional arguments don't exist in functions but macros are not functions!
+ */
+
+/*
+ * The should_panic Attribute
+ * We use this when something is expected to raise an error
+ */
+
+/*
+ * Using Result Enum in Tests
  */
 
 #[derive(Debug, Eq, PartialEq)]
@@ -69,6 +78,7 @@ struct Museum {
 
 impl Museum
 {
+    const MAXIMUM_CAPACITY: usize = 3;
     fn new() -> Self {
         Self {
             paintings: vec![],
@@ -77,6 +87,9 @@ impl Museum
     }
 
     fn buy_painting(&mut self, painting: &str) {
+        if self.paintings.len() >= Self::MAXIMUM_CAPACITY {
+            panic!("Museum does not have storage space for another painting");
+        }
         self.paintings.push(painting.to_string());
     }
 
@@ -100,7 +113,7 @@ mod tests {
         let mut museum_instance = super::Museum::new(); // NOTE: We use the super keyword here because this module is sub module. We don't have to declare Museum to be public thanks to this module being in the same file. We can also use the "crate" keyword so that we can get something from within the lib directory
         let mut museum_instance = Museum::new(); // NOTE: We can just do this thanks to our "use" at the top of the module
         museum_instance.sell_ticket();
-        assert_eq!(museum_instance.revenue, 25);
+        assert_eq!(museum_instance.revenue, 25, "The revenue from selling 1 ticket did not match expectations");
     }
 
     // Example of test failure
@@ -125,7 +138,7 @@ mod tests {
         museum.buy_painting("Mona Lisa");
         museum.buy_painting("Monte Carlo");
         museum.buy_painting("Deep Learning");
-        assert!(museum.has_impressive_collection());
+        assert!(museum.has_impressive_collection(), "The museum did not have an impressive collection despite having more than 2 paintings");
     }
 
     #[test]
@@ -134,6 +147,18 @@ mod tests {
         let mut museum_1 = Museum::new();
         // museum_1.sell_ticket();
         let museum_2 = Museum::new();
-        assert_eq!(museum_1, museum_2);
+        assert_eq!(museum_1, museum_2, "Two new musuem instances were not found to be equal: {museum_1:?} and {museum_2:?}");
+    }
+
+
+    #[test]
+    // #[should_panic] // This is how we inform cargo that this test should panic
+    #[should_panic(expected = "storage space")] // We do this when there's a specific type of panic we want to check for (in this case, specific string in the error message)
+    fn museum_prohibits_adding_painting_when_capacity_has_been_reached() {
+        let mut museum = Museum::new();
+        museum.buy_painting("Mona Lisa");
+        museum.buy_painting("Monte Carlo");
+        museum.buy_painting("Deep Learning");
+        museum.buy_painting("Flying Squirrels");
     }
 }
