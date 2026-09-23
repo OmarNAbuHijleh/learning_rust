@@ -92,29 +92,46 @@
 
 /*
  * Dependency Injection
+ * Look at "management.rs". you'll notice that we create a trait and have our unit test on a struct that implements that trait with the desired trait bounds. This is to increase the flexibility of our unit tests and reduce coupling
  */
 
-trait TicketSeller {
+/*
+ * Integration Tests
+ * Testing an individual method is a unit test. Integration tests test interaction between different functions or the code as a whole. Rust looks for integration tests in a top level "tests" directory. It treats those files as a separate crate it needs to compile.
+ *
+ * In these, we are testing the coupling!
+ *
+ * Integration tests in rust use your library crate's code
+ *
+ * "cargo test" runs both unit and integration tests!
+ */
+
+/*
+ * Documentation Tests
+ *
+ */
+
+pub trait TicketSeller {
     fn sell_ticket(&mut self);
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct Museum {
+pub struct Museum {
     paintings: Vec<String>,
-    revenue: u32,
+    pub revenue: u32,
 }
 
 impl Museum
 {
     const MAXIMUM_CAPACITY: usize = 3;
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             paintings: vec![],
             revenue: 0,
         }
     }
 
-    fn buy_painting(&mut self, painting: &str) {
+    pub fn buy_painting(&mut self, painting: &str) {
         if self.paintings.len() >= Self::MAXIMUM_CAPACITY {
             panic!("Museum does not have storage space for another painting");
         }
@@ -134,13 +151,13 @@ impl TicketSeller for Museum {
 }
 
 #[derive(Debug)]
-struct MovieTheater{
+pub struct MovieTheater{
     movies: Vec<String>,
     sales: u32,
 }
 
 impl MovieTheater{
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             movies: vec![],
             sales: 0,
@@ -170,11 +187,12 @@ mod tests {
         assert!(true);
     }
 
-    #[test]
-    fn print_failure() {
-        println!("Failure inside the function");
-        assert!(false);
-    }
+    // NOTE: You can also print failure cases
+    // #[test]
+    // fn print_failure() {
+    //     println!("Failure inside the function");
+    //     assert!(false);
+    // }
 
 
     #[test]
