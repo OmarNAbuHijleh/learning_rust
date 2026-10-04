@@ -1,0 +1,1 @@
+Modules 23 through 25 are being skipped. This is because they cover Randomness (rand crate), timing (chrono crate) and regular expressions (regex) which are all topics that are self explanatory and do not require extensive time to learn the functionality of.
