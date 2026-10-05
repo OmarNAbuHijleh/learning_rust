@@ -72,8 +72,77 @@
  */
 
 /*
- * Intro to Binary Search Trees
+ * Intro to Binary Search Trees and Creating a Binary Search Tree
+ * Searches the search area into two parts continuously. Each step in a binary search halves the search area. A binary search tree is a tree data structure that consists of nodes with values.
+ * Each node has between 0 and 2 children
+ * A node's value is greater than the value of all children in its left subtree. A node's value is smaller than the values of all children in its right subtree
  */
+
+/*
+ * The Deref and DerefMut Traits
+ */
+
+use std::cmp::Ordering; // compare and ordering
+
+#[derive(Debug)]
+enum BinarySearchTree {
+    Empty, // End of a given tree branch
+    Node {
+        value: i32,
+        left: Box<BinarySearchTree>,
+        right: Box<BinarySearchTree>,
+    },
+}
+
+impl BinarySearchTree {
+    fn new() -> Self {
+        BinarySearchTree::Empty
+    }
+
+    // NOTE: We're only using a unique BSD - no two elements are the same
+    fn insert(&mut self, new_value: i32) {
+        // We need to traverse the tree
+        match self {
+            BinarySearchTree::Empty => {
+                *self = BinarySearchTree::Node {
+                    value: new_value,
+                    left: Box::new(BinarySearchTree::Empty),
+                    right: Box::new(BinarySearchTree::Empty),
+                }
+            }
+            BinarySearchTree::Node { value, left, right } => match new_value.cmp(value) {
+                Ordering::Equal => (),
+                Ordering::Less => left.insert(new_value),
+                Ordering::Greater => right.insert(new_value),
+            },
+            // Can also do below
+            // BinarySearchTree::Node { value, left, right } => {
+            //     if *value < new_value {
+            //         right.insert(new_value);
+            //     } else if *value > new_value {
+            //         left.insert(new_value);
+            //     }
+            // }
+        }
+    }
+
+    fn contains(&mut self, search_value: i32) -> bool {
+        match self {
+            BinarySearchTree::Empty => {
+                return false;
+            }
+            BinarySearchTree::Node { value, left, right } => {
+                if *value == search_value {
+                    return true;
+                } else if *value < search_value {
+                    return right.contains(search_value);
+                } else {
+                    return left.contains(search_value);
+                }
+            }
+        }
+    }
+}
 
 // A vector is a smart pointer!
 // In this case, our file system can contain other file systems infinitely
@@ -236,5 +305,25 @@ fn main() {
         content: vec![rust_file, python_file], // NOTE: This takes ownership of the data from rust_file and python file
     };
 
-    println!("Intro to Binary Search Trees");
+    println!("Intro to Binary Search Trees and Creating a Binary Search Tree");
+    let mut tree = BinarySearchTree::new();
+    tree.insert(5);
+    tree.insert(8);
+    tree.insert(2);
+    tree.insert(3);
+    tree.insert(4);
+    tree.insert(10);
+    tree.insert(13);
+    tree.insert(12);
+    println!("{tree:#?}");
+
+    let contains_4 = tree.contains(4);
+    let contains_20 = tree.contains(20);
+    let contains_13 = tree.contains(13);
+    println!(
+        "contains 4: {}, contains 20: {}, contains 13: {}",
+        contains_4, contains_20, contains_13
+    );
+
+    println!("The Deref and DerefMut Traits");
 }
