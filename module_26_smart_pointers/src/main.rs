@@ -80,9 +80,72 @@
 
 /*
  * The Deref and DerefMut Traits
+ * The smart pointer implements the deref trait to enable a type to behave like a reference. We're going to write our own implementation of the Box smart pointer
+ *
+ */
+
+/*
+ * The Drop Trait
  */
 
 use std::cmp::Ordering; // compare and ordering
+use std::ops::{Deref, DerefMut};
+
+struct CustomBox2<T, U> {
+    data: T,
+    more_data: U,
+}
+
+impl<T, U> CustomBox2<T, U> {
+    // In this case, how is a smart pointer supposed to know which one we're dereferencing to? Type T or Type U?
+    fn new(data: T, more_data: U) -> Self {
+        Self { data, more_data }
+    }
+}
+
+impl<T, U> Deref for CustomBox2<T, U> {
+    // We create this "Target" return type because we may have more than one generic type we're able to dereference to!
+    // We need to let rust know which type we're dereferencing to! We can set what is being dereferenced within the struct
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+
+impl<T, U> DerefMut for CustomBox2<T, U> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.data
+    }
+}
+
+struct CustomBox<T> {
+    data: T, // The data we're storing
+}
+
+impl<T> CustomBox<T> {
+    fn new(data: T) -> Self {
+        Self { data: data }
+    }
+}
+
+impl<T> Deref for CustomBox<T> {
+    type Target = T; // What we're returning
+
+    // Can also have &T instead if we want as the return type in the definition
+    fn deref(&self) -> &Self::Target {
+        // Target is the data type we're returning
+        &self.data
+    }
+}
+
+impl<T> DerefMut for CustomBox<T> {
+    // NOTE: DerefMut is a sub trait of Deref. If we want to implement DerefMut we have to implement Deref!
+    // Can also set &mut T
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.data // Returning a mutable reference to the data
+    }
+}
 
 #[derive(Debug)]
 enum BinarySearchTree {
@@ -326,4 +389,18 @@ fn main() {
     );
 
     println!("The Deref and DerefMut Traits");
+
+    let custom_boxy = CustomBox::new(3.14);
+    println!("{}", *custom_boxy); // This won't work because we haven't implemented the deref trait! Works once we implement the Deref trait
+    println!("{}", custom_boxy.deref()); // Same thing
+
+    let mut custom_boxy = CustomBox::new(3.14);
+    *custom_boxy = 6.28;
+    println!("{}", *custom_boxy);
+
+    let mut custom_boxy_2 = CustomBox2::new(3.14, "Hello");
+    *custom_boxy_2 = 6.28;
+    println!("{}", *custom_boxy_2);
+
+    println!("The Drop Trait");
 }
