@@ -1,107 +1,99 @@
-/*
-Our goal is to build a program that will transform a
-string using a pipeline of one or more transformations.
-The transformations should be applicable in any order.
+use std::error::Error;
+use std::fmt::Display;
 
-We'll build two text transformations to start:
-- A whitespace transformation that removes whitespace
-  from the beginning of the string, the end of the
-  string, or both ends of the string
-- A case transformation that converts the string to
-  uppercase or lowercase
 
-See the `main` function for the final code we want
-to support. We'll build up a vector of trait objects,
-each of which implements the `TextTransformer` trait.
-The vector represents a pipeline, a sequential
-collection of steps/transforms to apply to the target
-String. We'll pass the vector to an `apply_transformations`
-function that will apply the transformations in the
-vector in order, passing each resulting String to the
-next transformation.
+#[derive(Debug)]
+struct ContainsPizzaError;
 
-If we encounter an error in a transformation, we want
-to print the error out to the user, skip the
-transformation, and pass the string to the next
-transformation in the pipeline.
+impl Display for ContainsPizzaError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Something went wrong: Hey, there's a pizza emoji in the text. So cheesy. Moving on to next transform")
+    }
+}
 
-------------
+impl Error for ContainsPizzaError{}
 
-Begin by defining a `TextTransformer` trait that
-requires a `transform` method. The method will accept
-an immutable reference to the instance and a string
-slice. It should return a `Result` where the success
-data will be a String and the error data will be a
-dynamic error/trait object.
+#[derive(Debug)]
+struct EmptyStringError;
 
-------------
+impl Display for EmptyStringError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Error Message: Something went wrong: The string has nothing left in it. Moving on to next transform")
+    }
+}
 
-Define a `WhitespaceTransformer` struct that stores
-`start` and `end` fields, both set to Booleans. These
-fields will dictate whether whitespace should be removed
-from the start, the end, or both ends of the string.
+impl Error for EmptyStringError{}
 
-Implement the `TextTransformer` trait for
-`WhitespaceTransformer`. The `transform` method should
-remove the whitespace from the appropriate end(s) of
-the string, then return a `Result` with the String.
+trait TextTransformer {
+    fn transform(&self, input_slice: &str) -> Result<String, Box<dyn Error>>;
+}
 
-The `transform` method should also handle two errors:
-- If the string contains a 🍕 emoji
-- If the string is completely empty after whitespace
-  has been removed
+#[derive(PartialEq)]
+enum Case {
+    Uppercase,
+    Lowercase,
+}
 
-For both of these errors, define a new error type that
-implements the `Error` trait.
+struct CaseTransformer {
+    case: Case
+}
 
-In the `transform` method, check for both of the two
-scenarios and return the appropriate error type. You'll
-need to figure out a way to support different types of
-errors being returned in the `Err` variant of the
-returned `Result`.
+impl TextTransformer for CaseTransformer {
+    fn transform(&self, input_slice: &str) -> Result<String, Box<dyn Error>> {
+        if self.case == Case::Lowercase {
+            return Ok(input_slice.to_lowercase());
+        }
+        return Ok(input_slice.to_uppercase());
+    }
+}
 
-------------
+struct WhitespaceTransformer {
+    start: bool,
+    end: bool
+}
 
-Define a `Case` enum with two variants: `Uppercase`
-and `Lowercase`.
+impl TextTransformer for WhitespaceTransformer {
+    fn transform(&self, input_slice: &str) -> Result<String, Box<dyn Error>> {
+        let mut ret_result = input_slice.to_string();
+        if self.start {
+            ret_result = ret_result.trim_start().to_string();
+        }
+        if self.end {
+            ret_result = ret_result.trim_end().to_string();
+        }
 
-Define a `CaseTransformer` struct that stores a `case`
-field set to a `Case` enum.
+        if ret_result.contains("🍕") {
+           return Err(Box::new(ContainsPizzaError));
+        }
 
-Implement the `TextTransformer` trait for
-`CaseTransformer`. The `transform` method should
-either capitalize or lowercase the passed-in string
-and return the value in an `Ok` variant.
+        if ret_result == "" {
+            return Err(Box::new(EmptyStringError));
+        }
 
-------------
+        Ok(ret_result)
+    }
+}
 
-Define an `apply_transformations` function that will
-accept a String and a vector of trait objects that all
-implement the `TextTransformer` trait. Find a way to iterate
-over the vector, perform a transformation over the
-starting string, then pass the resulting String to the
-next transformation in sequence.
 
-If you encounter an error (such as having a 🍕 emoji in
-the string), gracefully handle the error by skipping the
-current transformation and passing the current string
-to the next transformation in line.
-
-------------
-
-In the `main` function, run the program with the 3
-sample string inputs and confirm you see the expected
-outputs and error messages print out.
-*/
+fn apply_transformations(input_string: String, input_vec: Vec<Box<dyn TextTransformer>>) -> String {
+    let mut ret_string = input_string;
+    for transformation_struct in input_vec {
+        match transformation_struct.transform(&ret_string) {
+            Ok(value) => ret_string = value,
+            Err(error) => println!("{}", error)
+        };
+    }
+    return ret_string;
+}
 
 fn main() {
     // Input
-    let text = String::from("  homer simpson  ");
+    // let text = String::from("  homer simpson  ");
     // Output
     // Content: "HOMER SIMPSON"
 
     // Input
-    let text = String::from("  data  🍕  ");
+    // let text = String::from("  data  🍕  ");
     // Output
     // Error Message: Something went wrong: Hey, there's a pizza emoji in the text. So cheesy. Moving on to next transform
     // Content: "  DATA  🍕  "
