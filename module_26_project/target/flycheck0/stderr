@@ -1,0 +1,4 @@
+    Checking module_26_project v0.1.0 (/home/omar/Desktop/workspace/learning_rust/module_26_project)
+error: could not compile `module_26_project` (bin "module_26_project" test) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `module_26_project` (bin "module_26_project") due to 5 previous errors

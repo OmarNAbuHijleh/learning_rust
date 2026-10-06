@@ -86,10 +86,109 @@
 
 /*
  * The Drop Trait
+ * Customize what should happen when a variable goes out of scope. For example, deleting files that were written to a hard disk while deallocating or closing buffers.
+ */
+
+/*
+ * Deref Coercions
+ * A rust feature that simplifies working with references. When given a reference to a type that implements the Deref trait, Rust will convert it into a reference of another type if necessary
+ * An example is the conversion of &String to &str
+ */
+
+/*
+ * Trait Objects
+ * Recursive types were the first reason we used box smart pointers. The second common reason is trait objects.
+ *
+ * A trait object is an instance of some type that implements a specific trait. It allows for run-time polymorphism and iterating though structs implementing a specific trait
+ *
+ * If something can result in an error, it's convention to return the Result enum with the Ok or Err variants. It's often the case that different Error types implement the Error Trait.
+ * The Error trait cannot be implemented without the Display and Debug traits!
+ */
+
+/*
+ * Custom Error Types
+ * We can build our own custom error type
  */
 
 use std::cmp::Ordering; // compare and ordering
-use std::ops::{Deref, DerefMut};
+use std::error::Error;
+use std::fmt::Display;
+use std::fs;
+use std::ops::{Deref, DerefMut, Drop};
+
+#[derive(Debug)]
+struct NumberIsUnimpressiveError;
+
+impl Display for NumberIsUnimpressiveError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "That number is too small!")
+    }
+}
+
+impl Error for NumberIsUnimpressiveError {}
+
+fn read_number_from_file_min_size_100_version(path: &str) -> Result<i32, Box<dyn Error>> {
+    let file_contents = fs::read_to_string(path)?;
+    let parsed_number = file_contents.trim().parse::<i32>()?;
+
+    if parsed_number < 100 {
+        Err(Box::new(NumberIsUnimpressiveError))
+    } else {
+        Ok(parsed_number)
+    }
+}
+
+fn read_number_from_file(path: &str) -> Result<i32, Box<dyn Error>> {
+    // Since both of these have Error types that implement the Error trait, we can wrap them in a box. The ? (try) operator will automatically wrap it in a box for us!
+    let file_contents: String = fs::read_to_string(path)?; // Returns an IoError
+    let parsed_number = file_contents.trim().parse::<i32>()?; // Returns ParseIntError
+    Ok(parsed_number)
+}
+
+// An explicit version of what happens in the above function
+fn read_number_from_file2(path: &str) -> Result<i32, Box<dyn Error>> {
+    // Since both of these have Error types that implement the Error trait, we can wrap them in a box. The ? (try) operator will automatically wrap it in a box for us!
+    let file_contents: String = match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => return Err(Box::new(error)),
+    };
+    let parsed_number = match file_contents.trim().parse::<i32>() {
+        Ok(content) => content,
+        Err(error) => return Err(Box::new(error)),
+    };
+    Ok(parsed_number)
+}
+
+trait Wearable {
+    fn wear(&self) -> String;
+}
+
+#[derive(Debug)]
+struct Pants {
+    fabric: String,
+    waist_size: u32,
+}
+
+impl Wearable for Pants {
+    fn wear(&self) -> String {
+        format!("{} {} pants", self.fabric, self.waist_size)
+    }
+}
+
+#[derive(Debug)]
+struct Tie {
+    color: String,
+}
+
+impl Wearable for Tie {
+    fn wear(&self) -> String {
+        format!("{} tie", self.color)
+    }
+}
+
+fn output_text(text: &str) {
+    println!("{}", text);
+}
 
 struct CustomBox2<T, U> {
     data: T,
@@ -116,6 +215,15 @@ impl<T, U> Deref for CustomBox2<T, U> {
 impl<T, U> DerefMut for CustomBox2<T, U> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data
+    }
+}
+
+impl<T, U> Drop for CustomBox2<T, U> {
+    fn drop(&mut self) {
+        // We're not actually doing this but we want to show that extra operations are happening following the cleanup
+        println!("I'm cleaning up related files on the hard drive");
+        println!("I'm terminating the network connection");
+        println!("I'm removing the custom box from memory");
     }
 }
 
@@ -403,4 +511,64 @@ fn main() {
     println!("{}", *custom_boxy_2);
 
     println!("The Drop Trait");
+    // You'll see extra things for when our CustomBox2 gets cleaned up
+
+    println!("Deref Coersions");
+    let text = String::from("Hello");
+    output_text(&text); // NOTE: We're passing in &String even though the argument needs to be &str
+
+    // We can also do this
+    let the_slice = text.deref();
+    output_text(the_slice);
+
+    // Works with box too, where deref coerce &Box to get a reference to the internal stored type &String, which references &str
+    let my_box = Box::new(text);
+    output_text(&my_box);
+
+    // If we didn't have deref coersion, we'd have to do this:
+    let text = String::from("Hello");
+    let my_box = Box::new(text);
+    let value = my_box.deref();
+    let the_final_value = value.deref();
+    output_text(the_final_value);
+
+    println!("Trait Objects");
+    let pants = Pants {
+        fabric: "Cotton".to_string(),
+        waist_size: 34,
+    };
+    let tie = Tie {
+        color: "Red".to_string(),
+    };
+
+    // let outfit = vec![pants, tie]; // Doesn't work because these are two different types. The box type can solve this problem!
+    let outfit: Vec<Box<dyn Wearable>> = vec![Box::new(pants), Box::new(tie)]; // The "dyn" keyword indicates this is dynamic, but each element in the box will be a dynamic type that implements the wearable trait!
+    // We store the fixed size box pointers on the stack! We're now able to do basic iteration!
+
+    for item in outfit {
+        println!("Putting on the {}", item.wear());
+    }
+
+    let result = "5".parse::<i32>();
+    match "abc".parse::<i32>() {
+        Ok(number) => println!("{number}"),
+        Err(error) => println!("My ParseIntError: {error:?}"),
+    }
+
+    println!("Reading number from file\n\n");
+    let file_name = "number.txt";
+    let result = read_number_from_file(file_name);
+    match result {
+        Ok(value) => println!("The Value is {value}"),
+        Err(error) => println!("The error is {error}"),
+    }
+
+    println!("\n\n");
+
+    println!("Custom Error Types");
+    let result = read_number_from_file_min_size_100_version(file_name);
+    match result {
+        Ok(value) => println!("The value is {value}"),
+        Err(error) => println!("{error}"),
+    }
 }
