@@ -58,9 +58,53 @@ impl List {
     }
 }
 
+// Second implementation using Rc
 // use std::ops::DerefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+#[derive(Debug)]
+struct Node2 {
+    value: i32,
+    next: Option<Rc<RefCell<Node2>>>,
+}
+
+impl Node2 {
+    fn new(value: i32) -> Self {
+        Self {
+            value: value,
+            next: None,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct List2 {
+    head: Option<Rc<RefCell<Node2>>>,
+}
+
+impl List2 {
+    fn new() -> Self {
+        Self { head: None }
+    }
+
+    fn append_node(&mut self, node_input: Rc<RefCell<Node2>>) {
+        if self.head.is_none() {
+            self.head = Some(node_input);
+            return;
+        }
+
+        let mut current_pointer = self.head.clone();
+        let new_node = Some(node_input);
+        while let Some(node) = current_pointer {
+            if node.borrow().next.is_none() {
+                node.borrow_mut().next = new_node;
+                return;
+            }
+            current_pointer = node.borrow().next.clone();
+        }
+    }
+}
 
 fn main() {
     println!("Exercise 1: Construct a List using Box");
@@ -95,4 +139,22 @@ fn main() {
 
     println!("Node 4 reference count: {}", Rc::strong_count(&node4));
     println!("{}", Rc::ptr_eq(&list_one[2], &list_two[1]));
+
+    // Trying to create a linked list where the elements can have multiple owners
+    let mut list2 = List2::new();
+    list2.append_node(Rc::new(RefCell::new(Node2::new(1))));
+    list2.append_node(Rc::new(RefCell::new(Node2::new(2))));
+    list2.append_node(Rc::new(RefCell::new(Node2::new(3))));
+
+    let mut list3 = List2::new();
+    list3.append_node(Rc::new(RefCell::new(Node2::new(10))));
+    list3.append_node(Rc::new(RefCell::new(Node2::new(11))));
+    list3.append_node(Rc::new(RefCell::new(Node2::new(12))));
+
+    let latest_node = Rc::new(RefCell::new(Node2::new(20)));
+    list2.append_node(Rc::clone(&latest_node));
+    list3.append_node(Rc::clone(&latest_node));
+
+    println!("{list2:#?}");
+    println!("{list3:#?}");
 }
